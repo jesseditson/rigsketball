@@ -1,17 +1,18 @@
-var gulp = require('gulp'),
-  browserify = require('gulp-browserify')
+var gulp = require('gulp')
+var browserify = require('./gulp/browserify')
+var gls = require('gulp-live-server')
 
-gulp.task('scripts', function() {
-
-  gulp.src(['app/main.js'])
-    .pipe(browserify({
-      debug: true,
-      transform: ['reactify', {
-        "es6": true
-      }]
-    }))
-    .pipe(gulp.dest('./public/'))
-
+gulp.task('serve', function () {
+  var server = gls.new(['--harmony', 'server.js'])
+  server.start();
+  // currently causes a crash...
+  // //use gulp.watch to trigger server actions(notify, start or stop)
+  // gulp.watch(['public/**/*.css', 'views/**/*.ejs', 'app/**/*.js', 'app/**/*.jsx'], server.notify)
+  // gulp.watch('server.js', server.start)
 })
 
-gulp.task('default', ['scripts'])
+gulp.task('browserify', function() {
+  return browserify(true)
+})
+
+gulp.task('default', ['browserify', 'serve'])

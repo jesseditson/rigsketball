@@ -1,11 +1,20 @@
 /** @jsx React.DOM */
 
-var React = require('react/addons')
+var React = require('react')
 
 var ReactApp = React.createClass({
-  componentDidMount() {},
+  getInitialState() {
+    return {
+      message: 'Hello there!'
+    }
+  },
+  componentDidMount() {
+    console.log('component mounted!')
+  },
   render() {
-    return <div></div>
+    return <div>
+      <p>{this.state.message}</p>
+    </div>
   }
 })
 

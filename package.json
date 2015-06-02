@@ -10,15 +10,19 @@
     "react": "~0.13.3"
   },
   "scripts": {
-    "start": "gulp scripts && node server.js"
+    "start": "gulp"
   },
   "devDependencies": {
+    "browser-sync": "^2.7.6",
     "browserify": "^10.2.3",
     "gulp": "^3.9.0",
-    "gulp-browserify": "^0.5.1",
     "gulp-concat": "^2.5.2",
+    "gulp-live-server": "0.0.17",
+    "gulp-util": "^3.0.5",
     "node-jsx": "^0.13.3",
     "react-tools": "^0.13.3",
-    "reactify": "^1.1.1"
+    "reactify": "^1.1.1",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.2.1"
   }
 }
