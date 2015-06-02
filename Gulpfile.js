@@ -16,5 +16,8 @@ gulp.task('serve', function () {
 gulp.task('browserify', function() {
   return browserify(true)
 })
+gulp.task('admin', function() {
+  return browserify(true, true)
+})
 
 gulp.task('default', ['browserify', 'serve'])

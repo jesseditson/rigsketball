@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 var React = require('react')
-var App = require('./components/App')
+var App = require('./components/admin/App')
 
 var mountNode = document.getElementById("main-mount")
 

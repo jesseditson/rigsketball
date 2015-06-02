@@ -8,10 +8,12 @@ var gutil = require('gulp-util')
 
 var config = {}
 
-var browserifyTask = function(devMode) {
+var browserifyTask = function(devMode, admin) {
+
+  var file = (admin ? 'admin' : 'main') + '.js'
 
   var b = browserify({
-    entries: 'app/main.js',
+    entries: ['app/' + file],
     debug: devMode,
     transform: [reactify]
   })
@@ -21,7 +23,7 @@ var browserifyTask = function(devMode) {
     return b
       .bundle()
       .on('error', gutil.log.bind(gutil, 'Browserify Error'))
-      .pipe(source('main.js'))
+      .pipe(source(file))
       // Specify the output destination
       .pipe(gulp.dest('public/'))
       .pipe(browserSync.reload({

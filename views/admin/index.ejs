@@ -1,4 +1,5 @@
-<% layout('layout') -%>
+<%- layout('layout') %>
+<%- partial('nav') %>
 <div id="main-mount" data-props="<%= JSON.stringify(props) %>">
   <%- reactOutput %>
 </div>
