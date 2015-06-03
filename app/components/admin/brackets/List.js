@@ -1,16 +1,22 @@
 /** @jsx React.DOM */
 
 var React = require('react')
-var Bracket = require('../../models/rest/Bracket')
+var Bracket = require('../../../models/rest/Bracket')
 
 module.exports = React.createClass({
   getInitialState() {
     return {
+      formError: null,
+      loading: null,
       form: {},
-      brackets: []
+      brackets: [],
+      error: null
     }
   },
   componentDidMount() {
+    this.reload()
+  },
+  reload() {
     var self = this
     Bracket.all(function(err, brackets) {
       if (err) throw err
@@ -30,31 +36,41 @@ module.exports = React.createClass({
       var self = this
       new Bracket({name: name, poolSize: poolSize}).save(function(err, bracket) {
         self.setState({loading: false, formError: err && err.message, form: {}})
+        self.reload()
       })
       newState.loading = true
       newState.formError = null
     }
     this.setState(newState)
   },
+  deleteBracket(id) {
+    var self = this
+    Bracket.delete(id, function(err) {
+      self.setState({error: err && err.message})
+      self.reload()
+    })
+  },
   createBracketForm() {
     return <div className="create-bracket">
       <h4>New Bracket</h4>
       <p className="form-error">{this.state.formError}</p>
-      <input type="text" ref="bracketName" placeholder="bracket name" value={this.state.form.nameValue} readOnly/>
-      <input type="number" ref="poolSize" placeholder="pool size" value={this.state.form.poolValue} readOnly/>
+      <input type="text" ref="bracketName" placeholder="bracket name" value={this.state.form.nameValue}/>
+      <input type="number" ref="poolSize" placeholder="pool size" value={this.state.form.poolValue}/>
       <button type="submit" onClick={this.saveNewBracket} disabled={this.state.loading}>{this.state.loading ? 'saving...' : 'save'}</button>
     </div>
   },
   bracketList() {
+    var self = this
     var brackets = this.state.brackets.map(function(b, idx) {
-      var link = '/api/brackets/' + b._id
-      return <li key={b._id}><a href={link}>{b.name}</a></li>
+      var link = '/admin/brackets/' + b._id
+      return <li key={b._id}><a href={link}>{b.name}</a> <a onClick={self.deleteBracket.bind(null,b._id)}>delete</a></li>
     })
     return <ul>{brackets}</ul>
   },
   render() {
+    var error = this.state.error
     return <div>
-      <h1>Brackets & Matches</h1>
+      <h5 className="error" style={{display: error ? 'block' : 'none'}}>{error}</h5>
       {this.createBracketForm()}
       {this.bracketList()}
     </div>

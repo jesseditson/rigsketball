@@ -7,7 +7,7 @@ var ExtendedModel = extend(Bracket,config);
 
 var getURL = function(url){
   url = url.replace(/^\//,'');
-  return ExtendedModel.baseURL.replace(/\/*$/,'/') + url;
+  return ExtendedModel.baseURL.replace(/\/*$/,'/') + url
 };
 
 ExtendedModel.byName = function(name,callback){
@@ -15,11 +15,16 @@ ExtendedModel.byName = function(name,callback){
     .get(getURL('brackets'))
     .query({name : name})
     .end(function(err,res){
-      err = err || res.error || (res.body && res.body.error);
-      if(err) return callback(err);
+      err = err || res.error || (res.body && res.body.error)
+      if(err) return callback(err)
       var r = new ExtendedModel(res.body)
-      callback(null,r);
+      callback(null,r)
     });
 };
+
+ExtendedModel.delete = function(id, callback) {
+  var m = new ExtendedModel({_id: id})
+  m.destroy(callback)
+}
 
 module.exports = ExtendedModel;

@@ -48,7 +48,10 @@ brackets.show = function(req,res,next){
     } else if(!item){
       res.status(404).json({error : 'Item not found'})
     } else {
-      res.json(item.toObject())
+      decorateBracket(item,function(err,bracket){
+        if(err) return next(err)
+        res.json(bracket)
+      })
     }
   })
 }
@@ -138,7 +141,7 @@ brackets.destroy = function(req,res,next){
       if(!err && !bracket){
         res.status(404).json({error : 'Item not found'})
       } else {
-        var matchIds = Object.keys(bracket.rounds).reduce(function(a,r){
+        var matchIds = Object.keys(bracket.rounds || []).reduce(function(a,r){
           return a.concat(bracket.rounds[r])
         },[])
         async.forEach(matchIds,function(matchId,done){

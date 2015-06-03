@@ -13,6 +13,8 @@ var MongoStore = require('connect-mongo')(session)
 
 var port = 4444
 
+Error.stackTraceLimit = Infinity
+
 // Make sure to include the JSX transpiler
 require('node-jsx').install({harmony: true})
 
