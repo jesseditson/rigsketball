@@ -6,10 +6,34 @@ var brackets = {}
 var resourceName = Bracket.prototype.collection
 
 var decorateBracket = function(bracket,callback){
-  async.forEach(Object.keys(bracket.rounds),function(round,done){
-    Match.byIdDecorated(bracket.rounds[round],function(err,matches){
+  var roundNums = Object.keys(bracket.rounds).sort(function(a, b) {
+    return parseInt(a) > parseInt(b) ? -1 : 1
+  })
+
+  var winners = {}
+  var lastRound
+  async.forEachSeries(roundNums,function(round,done){
+    winners[round] = []
+    var matchId = bracket.rounds[round]
+    var bands = []
+    if (lastRound) {
+      bands = winners[lastRound].reduce(function(a, b, idx) {
+        var position = idx % 2
+        var index = Math.floor(idx / 2)
+        a[index] = a[index] || []
+        a[index][position] = b
+        return a
+      }, [])
+    }
+    Match.byIdDecorated(matchId,bands,function(err,matches){
       if(err) return done(err)
       bracket.rounds[round] = matches
+      matches.forEach(function(match, idx) {
+        if (match.winner) {
+          winners[round][idx] = match.winner.toObject()
+        }
+      })
+      lastRound = round
       done(err)
     })
   },function(err){

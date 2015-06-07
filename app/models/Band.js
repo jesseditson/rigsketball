@@ -6,29 +6,19 @@ var Band = module.exports = new Model('Band',{
     disabled : true
   },
   name : {
-    type : String,
-    disabled : true,
-    get : function(){
-      return this.info ? this.info.Name : null;
-    }
+    type : String
   },
   bio : {
-    type : String,
-    disabled : true,
-    get : function(){
-      return this.info ? this.info.ShortBio : null;
-    }
+    type : String
   },
-  avatar : {
-    type : String,
-    disabled : true,
-    get : function(){
-      return this.info ? this.info.ImageUrls[0] : null;
-    }
+  photo : {
+    type : String
   },
-  info : {
-    type : 'Any',
-    disabled : true
+  soundcloud: {
+    type: String
+  },
+  bandcamp: {
+    type: String
   }
 }
 ,'bands');

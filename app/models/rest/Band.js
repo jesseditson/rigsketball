@@ -1,7 +1,13 @@
-var Band = require('../Band');
-var extend = require('mise-model-rest');
-var config = require('./config');
+var Band = require('../Band')
+var extend = require('mise-model-rest')
+var config = require('./config')
 
-var ExtendedModel = extend(Band,config);
+var ExtendedModel = extend(Band,config)
 
-module.exports = ExtendedModel;
+
+ExtendedModel.delete = function(id, callback) {
+  var m = new ExtendedModel({_id: id})
+  m.destroy(callback)
+}
+
+module.exports = ExtendedModel

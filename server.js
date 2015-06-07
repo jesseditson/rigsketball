@@ -15,7 +15,7 @@ var port = 4444
 
 Error.stackTraceLimit = Infinity
 
-// Make sure to include the JSX transpiler
+// include the JSX transpiler
 require('node-jsx').install({harmony: true})
 
 // config app
