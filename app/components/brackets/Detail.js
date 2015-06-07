@@ -1,12 +1,32 @@
 /** @jsx React.DOM */
 
 var React = require('react')
-var Bracket = require('../../../models/rest/Bracket')
-var Match = require('../../../models/rest/Match')
-var Band = require('../../../models/rest/Band')
+var Bracket = require('../../models/rest/Bracket')
+var Match = require('../../models/rest/Match')
+var Band = require('../../models/rest/Band')
 var async = require('async')
 var Typeahead = require('react-typeahead').Typeahead
 var DateTimePicker = require('react-widgets/lib/DateTimePicker')
+var moment = require('moment')
+
+var dateString = function(matchDate){
+  var dateString = 'TBD'
+  if(matchDate) {
+    var date = moment(matchDate)
+    // skip this, let's show the time always
+    if(false && date.isAfter(moment().endOf('day'))){
+      // not today, show the date
+      dateString = date.format('M/D')
+    } else if(moment().isBefore(date)) {
+      dateString = date.format('H:mm')
+    } else if(moment().isBefore(date.add(30,'minutes'))) {
+      dateString = 'LIVE'
+    } else {
+      dateString = 'FINAL'
+    }
+  }
+  return dateString
+}
 
 module.exports = React.createClass({
   getInitialState() {
@@ -15,14 +35,18 @@ module.exports = React.createClass({
       error: null,
       bands: [],
       bandsMap: {},
-      editMode: true
+      selectedRound: null
+    }
+  },
+  getDefaultProps() {
+    return {
+      editMode: true,
+      selectedRound: null
     }
   },
   componentDidMount() {
-    if (this.props.id) {
-      this.loadBracket(this.props.id)
-      this.loadBands()
-    }
+    this.loadBracket()
+    this.loadBands()
   },
   loadBands() {
     var self = this
@@ -52,14 +76,23 @@ module.exports = React.createClass({
       })
     })
   },
-  loadBracket(id) {
+  loadBracket() {
     var self = this
-    Bracket.one(id, function(err, bracket) {
-      self.setState({bracket: bracket, error: err})
-    })
+    var loaded = function(err, bracket) {
+      self.setState({
+        bracket: bracket,
+        error: err,
+        selectedRound : self.props.selectedRound || self.roundNums(bracket)[0]
+      })
+    }
+    if (this.props.id) {
+      Bracket.one(this.props.id, loaded)
+    } else if (this.props.bracketName) {
+      Bracket.byName(this.props.bracketName, loaded)
+    }
   },
   saveMatch(match) {
-    if (!this.state.editMode) return
+    if (!this.props.editMode) return
     var self = this
     new Match(match).save(function(err) {
       if (err) return self.setState({error: err})
@@ -82,15 +115,33 @@ module.exports = React.createClass({
     var bands = this.state.bands
     band = band || {}
     var editControls
-    if (this.state.editMode && editable) {
+    if (this.props.editMode && editable) {
       editControls = <div>
         <Typeahead options={bands} onOptionSelected={this.selectBand.bind(this, match, position)} placeholder="change band"/>
         <input type="number" defaultValue={match.scores[position]} placeholder="score" onBlur={this.updateScore.bind(this, match, position)}/>
       </div>
     }
-    return <div className="band" key={match._id + position}>
+    var classes = 'band band' + (position+1)
+    var style = {}
+    var backgroundCover = null
+    if (band.photo) {
+      style.backgroundImage = "url('"+band.photo+"')"
+      backgroundCover = <div className="band-background-cover"></div>
+    }
+    var bandLinks = []
+    var bandLink = function(n) {
+      return <a href={band[n]}><div className={n}></div></a>
+    }
+    if (band.soundcloud) bandLinks.push(bandLink('soundcloud'))
+    if (band.bandcamp) bandLinks.push(bandLink('bandcamp'))
+    return <div className={classes} key={match._id + position} style={style}>
+      {backgroundCover}
       <p>{band.name || 'none'}</p>
+      <div className="links">{bandLinks}</div>
+      <span className="score">{match.scores[position]}</span>
       {editControls}
+      <div className="border-bottom"></div>
+      <div className="border-right"></div>
     </div>
   },
   updateDate(match, date, dateStr) {
@@ -123,12 +174,23 @@ module.exports = React.createClass({
         <textarea ref={match._id + '-info'} defaultValue={match.info} placeholder='info' onBlur={this.updateInfo.bind(this, match)} />
       </div>
     }
+
+    var bubbleText = dateString(match.date)
+
     return <div className="match" key={match._id}>
       {this.band(match.bands[0], match, 0, editable)}
-      <span>vs</span>
       {this.band(match.bands[1], match, 1, editable)}
       {editControls}
+      <div className="bubble">
+        {bubbleText}
+      </div>
     </div>
+  },
+  roundNums(bracket) {
+    var rounds = (bracket || this.state.bracket).rounds
+    return Object.keys(rounds).sort(function(a, b) {
+      return parseInt(a) > parseInt(b) ? -1 : 1
+    })
   },
   round(round, num, editable) {
     var matches = round.map(this.match.bind(this, editable))
@@ -136,29 +198,62 @@ module.exports = React.createClass({
         {matches}
       </div>
   },
-  rounds() {
-    if (!this.state.bracket) return;
+  rounds(rounds) {
     var self = this
     var rounds = this.state.bracket.rounds
-
-    var roundNums = Object.keys(rounds).sort(function(a, b) {
-      return parseInt(a) > parseInt(b) ? -1 : 1
+    var k = this.state.selectedRound
+    var round = rounds[k]
+    var firstRound = this.roundNums[0] === k
+    return <div className="round">
+      {self.round(round, k, firstRound)}
+    </div>
+    // return this.roundNums().map(function(k, idx) {
+    //
+    // })
+  },
+  selectRound(round, e) {
+    this.setState({selectedRound: round})
+    if (e) e.preventDefault()
+  },
+  roundNav() {
+    var self = this
+    var rounds = this.state.bracket.rounds
+    var bracketName = this.state.bracket.name
+    var items = this.roundNums().map(function(k) {
+      var link = '/brackets/' + bracketName + '/rounds/' + k
+      var text = 'Round of ' + k
+      switch(k) {
+        case '16':
+          text = 'Sweet 16'
+          break
+        case '8':
+          text = 'Elite 8'
+          break
+        case '4':
+          text = 'Final Four'
+          break
+        case '2':
+          text = 'Semifinal'
+          break
+        case '1':
+          text = 'Final'
+          break
+      }
+      var classes = self.state.selectedRound === k ? 'selected' : null
+      return <a href="#" className={classes} onClick={self.selectRound.bind(self, k)}>{text}</a>
     })
-
-    return roundNums.map(function(k, idx) {
-      var round = rounds[k]
-      return <div className="round">
-        <h5>Round of {k}</h5>
-        {self.round(round, k, idx === 0)}
-      </div>
-    })
+    return <div className="round-nav">
+      {items}
+    </div>
   },
   render() {
+    if (!this.state.bracket) return <div><h5>Bracket Not Found.</h5></div>;
     var bracket = this.state.bracket || {}
     var error = this.state.error
-    return <div>
+
+    return <div className="bracket">
+      {this.roundNav()}
       <h5 className="error" style={{display: error ? 'block' : 'none'}}>{error}</h5>
-      <h1>{bracket.name}</h1>
       {this.rounds()}
     </div>
   }

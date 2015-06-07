@@ -2,11 +2,6 @@ var express = require('express')
 var router = express.Router()
 var ensureLoggedIn = require('./auth/ensureLoggedIn')
 
-// TODO: remove this in production - it's just skipping auth
-ensureLoggedIn = function(req, res, next) {
-  next()
-}
-
 /* mise api routes */
 // matches resources
 var matches = require('./matches')

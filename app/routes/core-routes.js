@@ -18,7 +18,7 @@ module.exports = function(app) {
   app.get('/*?', function(req, res) {
     // React.renderToString takes your component
     // and generates the markup
-    var pagePath = req.params[0].replace(/\/$/,'')
+    var pagePath = req.params[0] ? req.params[0].replace(/\/$/,'') : ''
     var reactHtml = React.renderToString(<App path={pagePath}/>)
     res.render('index.ejs', {
       props: {path: pagePath},

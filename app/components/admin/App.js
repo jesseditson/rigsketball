@@ -1,8 +1,8 @@
 /** @jsx React.DOM */
 
 var React = require('react')
-var BracketMatches = require('./brackets/BracketMatches')
-var Bands = require('./bands/Bands')
+var BracketMatches = require('../brackets/BracketMatches')
+var Bands = require('../bands/Bands')
 
 var App = React.createClass({
   getInitialState() {

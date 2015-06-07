@@ -25,7 +25,7 @@ var browserifyTask = function(devMode, admin) {
       .on('error', gutil.log.bind(gutil, 'Browserify Error'))
       .pipe(source(file))
       // Specify the output destination
-      .pipe(gulp.dest('public/'))
+      .pipe(gulp.dest('public/js/'))
       .pipe(browserSync.reload({
         stream: true
       }))

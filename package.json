@@ -3,6 +3,7 @@
   "main": "server.js",
   "dependencies": {
     "async": "^1.1.0",
+    "basic-auth": "^1.0.1",
     "bcryptjs": "^2.1.0",
     "body-parser": "~1.12.4",
     "connect-mongo": "^0.8.1",
@@ -13,8 +14,10 @@
     "mise-model": "0.0.5",
     "mise-model-mongo": "0.0.4",
     "mise-model-rest": "0.0.2",
+    "moment": "^2.10.3",
     "mongo-wrapper": "0.0.29",
     "morgan": "^1.5.3",
+    "node-compass": "^0.2.4",
     "objectid": "^3.2.0",
     "passport": "^0.2.2",
     "passport-local": "^1.0.0",

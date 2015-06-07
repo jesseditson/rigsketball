@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 var React = require('react')
-var Bracket = require('./Bracket')
+var Bracket = require('./brackets/Detail')
 
 var App = React.createClass({
   getInitialState() {

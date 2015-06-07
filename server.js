@@ -32,6 +32,10 @@ app.use(session({
   store: new MongoStore({ url : 'mongodb://localhost/sessions'})
 }))
 
+// compass styles
+var compass = require('node-compass')
+app.use(compass({css: 'styles'}))
+
 // ping endpoint for monitoring
 app.get('/ping',function(req,res,next){
   // TODO: set real time?
@@ -53,7 +57,7 @@ app.use(passport.session())
 app.use(require('./api/auth/middleware'))
 
 // set up api
-app.use('/api', require('./api'))
+app.use('/api', require('./api/auth/ensureLoggedIn'), require('./api'))
 
 // Set up Routes for the application
 require('./app/routes/core-routes.js')(app)

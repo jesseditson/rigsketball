@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 var React = require('react')
-var Band = require('../../../models/rest/Band')
+var Band = require('../../models/rest/Band')
 var request = require('superagent')
 var async = require('async')
 
@@ -15,18 +15,37 @@ module.exports = React.createClass({
       message: null
     }
   },
+  initialForm(band) {
+    band = band || this.props.band
+    var form = {}
+    if (band) {
+      form = {
+        nameValue: band.name,
+        bioValue: band.bio,
+        photoValue: band.photo,
+        soundcloudValue: band.soundcloud,
+        bandcampValue: band.bandcamp
+      }
+    }
+    return form
+  },
+  componentDidMount() {
+    this.setState({form: this.initialForm()})
+  },
   validateURL(url, assert, cb) {
     if (!cb) {
       cb = assert
       assert = function(res) { return res.status === 200 }
     }
-    if (!url) return cb(null, 'empty')
-    request
-      .head(url)
-      .end(function(err, res){
-        if (err) return cb(err)
-        cb(null, assert(res))
-      })
+    cb(null, true)
+    // TODO: make this work, fails because of XHR. Will need to move to a service and call locally.
+    // if (!url) return cb(null, 'empty')
+    // request
+    //   .head(url)
+    //   .end(function(err, res){
+    //     if (err) return cb(err)
+    //     cb(null, assert(res))
+    //   })
   },
   validateImage(image, cb) {
     var timeout = 2000
@@ -53,6 +72,7 @@ module.exports = React.createClass({
   saveNewBand() {
     if (this.state.loading) return
     var self = this
+    var bandId = this.props.band ? this.props.band._id : null
     var newState = { form: {} }
     var name  =  React.findDOMNode(this.refs.bandName).value
     var bio = React.findDOMNode(this.refs.bandBio).value
@@ -81,6 +101,7 @@ module.exports = React.createClass({
           newState.loading = true
           newState.formError = null
           new Band({
+            _id: bandId,
             name: name,
             bio: bio,
             photo: photo,
@@ -90,8 +111,8 @@ module.exports = React.createClass({
             self.setState({
               loading: false,
               formError: err && err.message,
-              form: {},
-              message: !err ? 'Successfully created band "'+band.name+'".' : null
+              form: self.initialForm(self.props.band ? band : null),
+              message: !err ? 'Successfully ' + (bandId ? 'updated' : 'created') + ' band "'+band.name+'".' : null
             })
             if (!err && self.props.onCreate) {
               self.props.onCreate(band)
@@ -108,7 +129,6 @@ module.exports = React.createClass({
   },
   createBandForm() {
     return <div className="create-band">
-      <h4>New Band</h4>
       <p className="form-error">{this.state.formError}</p>
       <input type="text" ref="bandName" placeholder="band name" value={this.state.form.nameValue}/>
       <textarea ref="bandBio" placeholder="bio" value={this.state.form.bioValue}/>

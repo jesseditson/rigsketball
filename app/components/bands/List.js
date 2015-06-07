@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 var React = require('react')
-var Band = require('../../../models/rest/Band')
+var Band = require('../../models/rest/Band')
 var Create = require('./Create')
 
 module.exports = React.createClass({
@@ -33,7 +33,7 @@ module.exports = React.createClass({
   bandsList() {
     var self = this
     var bands = this.state.bands.map(function(b, idx) {
-      var link = '/api/bands/' + b._id
+      var link = '/admin/bands/' + b._id
       return <li key={b._id}><a href={link}>{b.name}</a> <a onClick={self.deleteBand.bind(null,b._id)}>delete</a></li>
     })
     return <ul>{bands}</ul>

@@ -1,7 +1,7 @@
 /** @jsx React.DOM */
 
 var React = require('react')
-var Bracket = require('../../../models/rest/Bracket')
+var Bracket = require('../../models/rest/Bracket')
 
 module.exports = React.createClass({
   getInitialState() {
