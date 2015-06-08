@@ -1,0 +1,14 @@
+[Service]
+WorkingDirectory={{project_root}}/rigsketball
+ExecStart=/usr/bin/node cluster.js
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier={{project_name}}
+User=web
+Group=web
+EnvironmentFile=/var/www/env
+
+[Install]
+WantedBy=multi-user.target

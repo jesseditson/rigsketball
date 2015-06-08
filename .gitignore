@@ -1,4 +1,5 @@
 node_modules/
 npm-debug.log
-public/main.js
 .DS_Store
+ansible/templates/env.j2
+ansible/production

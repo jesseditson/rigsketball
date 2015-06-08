@@ -1,0 +1,27 @@
+---
+- name: add 10gen repo file
+  template: src=repo.j2 dest=/etc/yum.repos.d/10gen.repo
+  tags: mongodb
+
+- name: install mongodb
+  yum: name=mongo-10gen-server state=present
+  tags: mongodb
+
+- name: configure mongodb
+  template: src=mongod.conf.j2 dest=/etc/mongod.conf
+  tags: mongodb
+
+- name: Create database folder
+  file: path={{mongodb.db}} group=mongod owner=mongod mode=755 state=directory
+
+- name: Create log folder
+  file: path=/var/log/mongo group=mongod owner=mongod mode=755 state=directory
+
+- name: Add systemd conf
+  template: src=mongod.service dest=/etc/systemd/system/mongod.service
+  notify:
+    - systemctl enable mongod
+
+- name: run mongodb
+  service: name=mongod state=started enabled=yes
+  tags: mongodb

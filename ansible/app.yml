@@ -1,0 +1,40 @@
+---
+- hosts: app
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Install yum packages
+      yum: name={{item}} state=latest
+      with_items:
+        - git
+        - nodejs
+        - npm
+
+    - name: install n (node version installer/switcher)
+      npm: name=n state=present global=yes
+
+    - name: install the latest stable version of node
+      shell: n stable
+
+    - name: Create web user
+      user: name=web
+
+    - name: Create project folder
+      file: path=/var/www group=web owner=web mode=755 state=directory
+
+    - name: Copy local env file
+      template: src=templates/env.j2 dest=/var/www/env
+
+    - name: Add systemd conf
+      template: src=templates/systemd.service.j2 dest=/etc/systemd/system/{{project_name}}-web.service
+      notify:
+        - enable {{project_name}}-web
+        - open port 3000
+
+  handlers:
+    - name: enable {{project_name}}-web
+      shell: systemctl enable {{project_name}}-web
+
+    - name: open port 3000
+      shell: firewall-cmd --permanent --zone=public --add-port=3000/tcp

@@ -1,0 +1,7 @@
+---
+project_name: rigsketball
+project_root: /var/www
+project_repo: https://github.com/jesseditson/rigsketball.git
+
+mongodb:
+    db: /data/db
