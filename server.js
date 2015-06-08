@@ -11,7 +11,8 @@ var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 var MongoStore = require('connect-mongo')(session)
 
-var port = 4444
+var port = process.env.APP_PORT || 4444
+var address = process.env.APP_IP || '127.0.0.1'
 
 Error.stackTraceLimit = Infinity
 
@@ -94,5 +95,5 @@ app.use(function(err, req, res, next) {
     }))
 })
 
-app.listen(port)
+app.listen(port, address)
 console.log('Server is Up and Running at Port : ' + port)
