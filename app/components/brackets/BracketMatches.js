@@ -17,7 +17,7 @@ module.exports = React.createClass({
     var currentView
     if (lastComponent !== 'brackets') {
       // detail page
-      currentView = <Detail id={lastComponent} />
+      currentView = <Detail id={lastComponent} editMode={true} />
     } else {
       // normal view
       currentView = <List />

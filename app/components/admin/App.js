@@ -8,9 +8,6 @@ var App = React.createClass({
   getInitialState() {
     return {}
   },
-  componentDidMount() {
-
-  },
   render() {
     var mainView = <h1>Admin</h1>
     if (/brackets(\/|$)/.test(this.props.path)) {

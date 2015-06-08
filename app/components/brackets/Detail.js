@@ -40,7 +40,7 @@ module.exports = React.createClass({
   },
   getDefaultProps() {
     return {
-      editMode: true,
+      editMode: false,
       selectedRound: null
     }
   },
@@ -96,12 +96,14 @@ module.exports = React.createClass({
     var self = this
     new Match(match).save(function(err) {
       if (err) return self.setState({error: err})
+      self.loadBracket()
       self.loadBands()
     })
   },
   updateScore(match, position, e) {
     var score = parseInt(e.target.value)
-    if (!isNaN(score) && match.scores[position] != score) {
+    if (isNaN(score)) score = null
+    if (match.scores[position] != score) {
       match.scores[position] = score
       this.saveMatch(match)
     }
@@ -166,9 +168,9 @@ module.exports = React.createClass({
   },
   match(editable, match) {
     var editControls
-    if (this.state.editMode) {
+    if (this.props.editMode) {
       var date = match.date ? new Date(match.date) : null
-      editControls = <div>
+      editControls = <div className="date-picker">
         <DateTimePicker ref={match._id + '-date'} defaultValue={date} onChange={this.updateDate.bind(this, match)} />
         <input type="text" ref={match._id + '-location'} placeholder='location' defaultValue={match.location} onBlur={this.updateInfo.bind(this, match)} />
         <textarea ref={match._id + '-info'} defaultValue={match.info} placeholder='info' onBlur={this.updateInfo.bind(this, match)} />
@@ -177,7 +179,9 @@ module.exports = React.createClass({
 
     var bubbleText = dateString(match.date)
 
-    return <div className="match" key={match._id}>
+    var classes = this.props.editMode ? 'match-edit' : 'match'
+
+    return <div className={classes} key={match._id}>
       {this.band(match.bands[0], match, 0, editable)}
       {this.band(match.bands[1], match, 1, editable)}
       {editControls}
@@ -203,13 +207,10 @@ module.exports = React.createClass({
     var rounds = this.state.bracket.rounds
     var k = this.state.selectedRound
     var round = rounds[k]
-    var firstRound = this.roundNums[0] === k
+    var firstRound = this.roundNums()[0] === k
     return <div className="round">
       {self.round(round, k, firstRound)}
     </div>
-    // return this.roundNums().map(function(k, idx) {
-    //
-    // })
   },
   selectRound(round, e) {
     this.setState({selectedRound: round})
