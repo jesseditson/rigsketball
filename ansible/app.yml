@@ -4,9 +4,19 @@
     - vars.yml
 
   tasks:
+    - name: Add Epel repo
+      yum:
+        name: epel-release
+        state: present
+
     - name: Install yum packages
       yum: name={{item}} state=latest
       with_items:
+        - make
+        - automake
+        - gcc
+        - gcc-c++
+        - kernel-devel
         - git
         - nodejs
         - npm
@@ -31,16 +41,8 @@
     - name: Copy local env file
       template: src=templates/env.j2 dest=/var/www/env
 
-    - name: Add systemd conf
-      template: src=templates/systemd.service.j2 dest=/etc/systemd/system/{{project_name}}-web.service
-      notify:
-        - enable {{project_name}}-web
-        - open port 3000
-        - restart firewalld
-
-  handlers:
-    - name: enable {{project_name}}-web
-      shell: systemctl enable {{project_name}}-web
+    - name: start firewalld
+      shell: systemctl start firewalld
 
     - name: open port 3000
       shell: firewall-cmd --permanent --zone=public --add-port=3000/tcp
@@ -48,3 +50,12 @@
     - name: restart firewalld
       service: name=firewalld state=restarted
       tags: mongodb
+
+    - name: Add systemd conf
+      template: src=templates/systemd.service.j2 dest=/etc/systemd/system/{{project_name}}-web.service
+      notify:
+        - enable {{project_name}}-web
+
+  handlers:
+    - name: enable {{project_name}}-web
+      shell: systemctl enable {{project_name}}-web

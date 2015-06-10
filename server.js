@@ -30,7 +30,7 @@ app.use(session({
   name : 'Rigsketball',
   resave : false,
   saveUninitialized : false,
-  store: new MongoStore({ url : 'mongodb://localhost/sessions'})
+  store: new MongoStore(require('./app/models/mongo/config'))
 }))
 
 // compass styles

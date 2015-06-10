@@ -7,19 +7,19 @@
     - name: Copy local env file
       template: src=templates/env.j2 dest=/var/www/env
 
-    - name: blow away workspace
-      file:  path={{project_root}}/rigsketball state=absent
+    # - name: blow away workspace
+    #   file:  path={{project_root}}/rigsketball state=absent
 
     - name: update repo
       git: repo={{project_repo}} version=master dest={{project_root}}/rigsketball
       sudo: yes
       sudo_user: web
-      notify:
-        - reload {{project_name}}-web
-        - flush iptables
 
     - name: install npm dependencies
       npm: path={{project_root}}/rigsketball production=yes
+      notify:
+        - reload {{project_name}}-web
+        - flush iptables
 
   handlers:
     - name: reload {{project_name}}-web
