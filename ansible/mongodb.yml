@@ -3,5 +3,11 @@
   vars_files:
     - vars.yml
 
+  tasks:
+    - name: Disable ssh password login
+      lineinfile: dest=/etc/ssh/sshd_config state=present regexp='^#?PasswordAuthentication no' line='PasswordAuthentication no'
+    - name: restart sshd
+      service: name=sshd state=restarted
+
   roles:
     - mongodb

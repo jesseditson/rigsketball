@@ -1,26 +1,32 @@
 ---
-- name: add 10gen repo file
-  template: src=repo.j2 dest=/etc/yum.repos.d/10gen.repo
-  tags: mongodb
 
 - name: install mongodb
-  yum: name=mongo-10gen-server state=present
-  tags: mongodb
-
-- name: configure mongodb
-  template: src=mongod.conf.j2 dest=/etc/mongod.conf
+  yum: name=mongodb,mongodb-server disablerepo=* enablerepo=fedora,updates state=present
   tags: mongodb
 
 - name: Create database folder
-  file: path={{mongodb.db}} group=mongod owner=mongod mode=755 state=directory
+  file: path={{mongodb.db}} group=mongodb owner=mongodb mode=755 state=directory
+  tags: mongodb
 
 - name: Create log folder
-  file: path=/var/log/mongo group=mongod owner=mongod mode=755 state=directory
+  file: path=/var/log/mongo group=mongodb owner=mongodb mode=755 state=directory
+  tags: mongodb
 
-- name: Add systemd conf
-  template: src=mongod.service dest=/etc/systemd/system/mongod.service
-  notify:
-    - systemctl enable mongod
+- name: configure mongodb
+  template: src=mongodb.conf.j2 group=mongodb owner=mongodb mode=755 dest=/etc/mongodb.conf
+  tags: mongodb
+
+- name: open port 27017
+  shell: firewall-cmd --permanent --zone=public --add-port=27017/tcp
+  tags: mongodb
+
+- name: open port 28017 (web console)
+  shell: firewall-cmd --permanent --zone=public --add-port=28017/tcp
+  tags: mongodb
+
+- name: restart firewalld
+  service: name=firewalld state=restarted
+  tags: mongodb
 
 - name: run mongodb
   service: name=mongod state=started enabled=yes

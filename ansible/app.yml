@@ -11,6 +11,11 @@
         - nodejs
         - npm
 
+    - name: Disable ssh password login
+      lineinfile: dest=/etc/ssh/sshd_config state=present regexp='^(\s+)?#?(\s+)?PasswordAuthentication(\s+)?no' line='PasswordAuthentication no'
+    - name: restart sshd
+      service: name=sshd state=restarted
+
     - name: install n (node version installer/switcher)
       npm: name=n state=present global=yes
 
@@ -31,6 +36,7 @@
       notify:
         - enable {{project_name}}-web
         - open port 3000
+        - restart firewalld
 
   handlers:
     - name: enable {{project_name}}-web
@@ -38,3 +44,7 @@
 
     - name: open port 3000
       shell: firewall-cmd --permanent --zone=public --add-port=3000/tcp
+
+    - name: restart firewalld
+      service: name=firewalld state=restarted
+      tags: mongodb

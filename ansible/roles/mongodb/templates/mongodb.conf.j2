@@ -1,22 +1,13 @@
-# mongo.conf
-
-#where to log
-logpath=/var/log/mongo/mongod.log
-
-logappend=true
-
-# fork and run in background
+##
+### Basic Defaults
+##
+# bind_ip = 127.0.0.1
+port = 27017
 fork = true
-
-#port = 27017
-
-dbpath={{mongodb.db}}
-
-# location of pidfile
-pidfilepath = /var/run/mongodb/mongod.pid
-
-# Disables write-ahead journaling
-# nojournal = true
+pidfilepath = /var/run/mongodb/mongodb.pid
+logpath = /var/log/mongodb/mongodb.log
+dbpath =/var/lib/mongodb
+journal = true
 
 # Enables periodic logging of CPU utilization and I/O wait
 #cpu = true
@@ -41,13 +32,16 @@ pidfilepath = /var/run/mongodb/mongod.pid
 #   2=R
 #   3=both
 #   7=W+some reads
-#diaglog = 0
+#oplog = 0
+
+# Diagnostic/debugging option
+#nocursors = true
 
 # Ignore query hints
 #nohints = true
 
-# Disable the HTTP interface (Defaults to localhost:27018).
-#nohttpinterface = true
+# Disable the HTTP interface (Defaults to port+1000).
+nohttpinterface = false
 
 # Turns off server-side scripting.  This will result in greatly limited
 # functionality
@@ -81,3 +75,14 @@ pidfilepath = /var/run/mongodb/mongod.pid
 # or
 #master = true
 #source = slave.example.com
+
+# Address of a server to pair with.
+#pairwith = <server:port>
+# Address of arbiter server.
+#arbiter = <server:port>
+# Automatically resync if slave data is stale
+#autoresync
+# Custom size for replication operation log.
+#oplogSize = <MB>
+# Size limit for in-memory storage of op ids.
+#opIdMem = <bytes>

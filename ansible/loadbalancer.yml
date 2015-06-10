@@ -2,6 +2,11 @@
 - hosts: loadbalancer
 
   tasks:
+    - name: Disable ssh password login
+      lineinfile: dest=/etc/ssh/sshd_config state=present regexp='^#?PasswordAuthentication no' line='PasswordAuthentication no'
+    - name: restart sshd
+      service: name=sshd state=restarted
+
     - name: install haproxy
       yum: name=haproxy state=latest
       notify: flush iptables

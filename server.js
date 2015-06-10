@@ -97,3 +97,7 @@ app.use(function(err, req, res, next) {
 
 app.listen(port, address)
 console.log('Server is Up and Running at Port : ' + port)
+console.log('env: ')
+for (var v in process.env) {
+  console.log(v + '=' + process.env[v])
+}
