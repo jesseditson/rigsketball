@@ -4,6 +4,7 @@
     - vars.yml
 
   tasks:
+
     - name: Copy local env file
       template: src=templates/env.j2 dest=/var/www/env
 
@@ -17,13 +18,15 @@
 
     - name: install npm dependencies
       npm: path={{project_root}}/rigsketball production=yes
-      notify:
-        - reload {{project_name}}-web
-        - flush iptables
 
-  handlers:
-    - name: reload {{project_name}}-web
+    - name: reload rigsketball-web
       service: name={{project_name}}-web state=reloaded
 
-    - name: flush iptables
-      shell: iptables -F
+    - name: Copy nginx config
+      template: src=templates/nginx.conf.j2 dest=/etc/nginx/nginx.conf
+
+    - name: enable/start nginx
+      service: name=nginx state=started enabled=yes
+
+    - name: reload nginx
+      service: name=nginx state=reloaded

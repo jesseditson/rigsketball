@@ -11,10 +11,9 @@ var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 var MongoStore = require('connect-mongo')(session)
 
+
 var port = process.env.APP_PORT || 4444
 var address = process.env.APP_IP || '127.0.0.1'
-
-Error.stackTraceLimit = Infinity
 
 // include the JSX transpiler
 require('node-jsx').install({harmony: true})
@@ -34,8 +33,16 @@ app.use(session({
 }))
 
 // compass styles
-var compass = require('node-compass')
-app.use(compass({css: 'styles'}))
+if (app.get('env') === 'development') {
+  var compass = require('node-compass')
+  app.use(compass({css: 'styles'}))
+
+  // Include static assets. In production nginx handles this.
+  app.use(express.static(path.join(__dirname, 'public')))
+
+  // long traces
+  Error.stackTraceLimit = Infinity
+}
 
 // ping endpoint for monitoring
 app.get('/ping',function(req,res,next){
@@ -43,8 +50,6 @@ app.get('/ping',function(req,res,next){
   res.send('<pingdom_http_custom_check><status>OK</status><response_time>'+10+'</response_time></pingdom_http_custom_check>')
 })
 
-// Include static assets. Not advised for production
-app.use(express.static(path.join(__dirname, 'public')))
 // Set view path
 app.set('views', path.join(__dirname, 'views'))
 // set up ejs for templating.
@@ -58,7 +63,7 @@ app.use(passport.session())
 app.use(require('./api/auth/middleware'))
 
 // set up api
-app.use('/api', require('./api/auth/ensureLoggedIn'), require('./api'))
+app.use('/api', require('./api'))
 
 // Set up Routes for the application
 require('./app/routes/core-routes.js')(app)
@@ -97,7 +102,7 @@ app.use(function(err, req, res, next) {
 
 app.listen(port, address)
 console.log('Server is Up and Running at Port : ' + port)
-console.log('env: ')
-for (var v in process.env) {
-  console.log(v + '=' + process.env[v])
-}
+// console.log('env: ')
+// for (var v in process.env) {
+//   console.log(v + '=' + process.env[v])
+// }

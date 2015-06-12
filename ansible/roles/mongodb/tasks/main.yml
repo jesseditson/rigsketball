@@ -16,6 +16,9 @@
   template: src=mongodb.conf.j2 group=mongodb owner=mongodb mode=755 dest=/etc/mongodb.conf
   tags: mongodb
 
+- name: enable firewalld
+  service: name=firewalld state=started enabled=yes
+
 - name: open port 27017
   shell: firewall-cmd --permanent --zone=public --add-port=27017/tcp
   tags: mongodb
@@ -24,8 +27,12 @@
   shell: firewall-cmd --permanent --zone=public --add-port=28017/tcp
   tags: mongodb
 
-- name: restart firewalld
-  service: name=firewalld state=restarted
+- name: open port 27017 immediately
+  shell: firewall-cmd --permanent --add-port=27017/tcp
+  tags: mongodb
+
+- name: open port 28017 (web console) immediately
+  shell: firewall-cmd --zone=public --add-port=28017/tcp
   tags: mongodb
 
 - name: run mongodb

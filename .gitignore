@@ -3,3 +3,4 @@ npm-debug.log
 .DS_Store
 ansible/templates/env.j2
 ansible/production
+env

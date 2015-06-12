@@ -2,6 +2,6 @@
 
 set -e
 cd ansible
-ansible-playbook -i production mongodb.yml
-ansible-playbook -i production loadbalancer.yml
-ansible-playbook -i production app.yml
+ansible-playbook -i production mongodb.yml $@
+ansible-playbook -i production loadbalancer.yml $@
+ansible-playbook -i production app.yml $@

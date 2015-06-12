@@ -20,9 +20,10 @@
         - git
         - nodejs
         - npm
+        - nginx
 
     - name: Disable ssh password login
-      lineinfile: dest=/etc/ssh/sshd_config state=present regexp='^(\s+)?#?(\s+)?PasswordAuthentication(\s+)?no' line='PasswordAuthentication no'
+      lineinfile: dest=/etc/ssh/sshd_config state=present regexp='^(\s+)?#?(\s+)?PasswordAuthentication(\s+)?(no|yes)' line='PasswordAuthentication no'
     - name: restart sshd
       service: name=sshd state=restarted
 
@@ -41,15 +42,13 @@
     - name: Copy local env file
       template: src=templates/env.j2 dest=/var/www/env
 
-    - name: start firewalld
-      shell: systemctl start firewalld
+    - name: enable firewalld
+      service: name=firewalld state=started enabled=yes
 
     - name: open port 3000
       shell: firewall-cmd --permanent --zone=public --add-port=3000/tcp
-
-    - name: restart firewalld
-      service: name=firewalld state=restarted
-      tags: mongodb
+    - name: open port 3000 for current session
+      shell: firewall-cmd --zone=public --add-port=3000/tcp
 
     - name: Add systemd conf
       template: src=templates/systemd.service.j2 dest=/etc/systemd/system/{{project_name}}-web.service
