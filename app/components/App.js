@@ -5,7 +5,7 @@ var Bracket = require('./brackets/Detail')
 
 var App = React.createClass({
   render() {
-    var bracketName = 'foo'
+    var bracketName = 'pdxpopnow2015'
     return <div>
       <Bracket bracketName={bracketName}/>
     </div>

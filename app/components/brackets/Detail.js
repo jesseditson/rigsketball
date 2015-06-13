@@ -35,7 +35,8 @@ module.exports = React.createClass({
       error: null,
       bands: [],
       bandsMap: {},
-      selectedRound: null
+      selectedRound: null,
+      bracketMode: true
     }
   },
   getDefaultProps() {
@@ -198,18 +199,40 @@ module.exports = React.createClass({
   },
   round(round, num, editable) {
     var matches = round.map(this.match.bind(this, editable))
-    return <div className="round" key={'round' + num}>
-        {matches}
+    var right = []
+    var left = matches.filter(function(m, i) {
+      if (i % 2) {
+        return true
+      }
+      right.push(m)
+    })
+    var className = "round round" + num
+    return <div className={className} key={'round' + num}>
+        <div className="left row">
+          {left}
+        </div>
+        <div className="right row">
+          {right}
+        </div>
       </div>
   },
   rounds(rounds) {
     var self = this
     var rounds = this.state.bracket.rounds
-    var k = this.state.selectedRound
-    var round = rounds[k]
-    var firstRound = this.roundNums()[0] === k
-    return <div className="round">
-      {self.round(round, k, firstRound)}
+    var roundNums = this.roundNums()
+    var renderRound = function(k) {
+      var firstRound = roundNums[0] === k
+      var round = rounds[k]
+      return self.round(round, k, firstRound)
+    }
+    var rendered
+    if (this.state.bracketMode) {
+      rendered = roundNums.map(renderRound)
+    } else {
+      rendered = renderRound(this.state.selectedRound)
+    }
+    return <div className="rounds">
+      {rendered}
     </div>
   },
   selectRound(round, e) {
@@ -217,6 +240,7 @@ module.exports = React.createClass({
     if (e) e.preventDefault()
   },
   roundNav() {
+    if (this.state.bracketMode) return
     var self = this
     var rounds = this.state.bracket.rounds
     var bracketName = this.state.bracket.name
@@ -248,7 +272,7 @@ module.exports = React.createClass({
     </div>
   },
   render() {
-    if (!this.state.bracket) return <div><h5>Bracket Not Found.</h5></div>;
+    if (!this.state.bracket) return <div><h5>Bracket Not Found.</h5></div>
     var bracket = this.state.bracket || {}
     var error = this.state.error
 

@@ -39,13 +39,15 @@ ExtendedModel.byIdDecorated = function(query,winners,callback){
 var originalSave = ExtendedModel.prototype.save
 ExtendedModel.prototype.save = function() {
   // restore non-decorated data
-  this.bands = this.bands.map(function(band) {
-    if (band._id) {
-      return band._id
-    } else {
-      return band
-    }
-  })
+  if (this.bands) {
+    this.bands = this.bands.map(function(band) {
+      if (band._id) {
+        return band._id
+      } else {
+        return band
+      }
+    })
+  }
   return originalSave.apply(this, arguments)
 }
 

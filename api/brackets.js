@@ -6,6 +6,7 @@ var brackets = {}
 var resourceName = Bracket.prototype.collection
 
 var decorateBracket = function(bracket,callback){
+  if (!bracket.rounds) return callback(new Error('corrupted bracket.'))
   var roundNums = Object.keys(bracket.rounds).sort(function(a, b) {
     return parseInt(a) > parseInt(b) ? -1 : 1
   })
