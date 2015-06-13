@@ -7,7 +7,7 @@ var App = React.createClass({
   render() {
     var bracketName = 'pdxpopnow2015'
     return <div>
-      <Bracket bracketName={bracketName}/>
+      <Bracket bracketName={bracketName} {...this.props}/>
     </div>
   }
 })

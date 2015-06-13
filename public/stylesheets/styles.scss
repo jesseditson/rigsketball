@@ -5,6 +5,7 @@
 @import 'compass/css3/transform';
 @import 'compass/css3/opacity';
 @import 'compass/css3/box-sizing';
+@import "compass/css3/transition";
 
 $ash: #655643;
 $cyan: #80BCA3;
@@ -14,6 +15,7 @@ $darkorange: #BF4D28;
 
 body {
   background-color: $ash;
+  background-image: url(/img/asfalt-dark.png);
   font-family: 'trash-hand';
   font-size: 2em;
   color: $offwhite;
@@ -109,6 +111,47 @@ h2.script {
     border-radius: 50%;
     border: 3px solid;
     line-height: 80px;
+    cursor: pointer;
+  }
+}
+
+button {
+  font-family: 'nexa_rust_sansblack';
+  color: $cyan;
+  background-color: $ash;
+  border-radius: 10%;
+  border: 3px solid;
+  padding: 10px 20px;
+  font-size: 0.7em;
+  margin: 0px 10px;
+}
+
+.selectable {
+  @include transition(all .2s ease-in-out);
+  cursor: pointer;
+  &:hover {
+    @include transform( scale(1.1) );
+  }
+}
+
+.modal {
+  position: fixed;
+  top: 0px;
+  left:0px;
+  right:0px;
+  bottom:0px;
+  background-color: rgba($ash, 0.4);
+  & > div {
+    position: absolute;
+    top: 30%;
+    background-color: $darkorange;
+    padding: 20px;
+    border-radius: 20px;
+    width: 80%;
+    left: 10%;
+    .buttons {
+      text-align:right;
+    }
   }
 }
 

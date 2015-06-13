@@ -20,11 +20,31 @@ module.exports = function(app) {
     // React.renderToString takes your component
     // and generates the markup
     var pagePath = req.params[0] ? req.params[0].replace(/\/$/,'') : ''
-    var reactHtml = React.renderToString(<App path={pagePath}/>)
-    res.render('index.ejs', {
-      props: {path: pagePath},
-      reactOutput: reactHtml
-    })
+
+    var opts = {
+      path: pagePath
+    }
+
+    var render = function() {
+      var reactHtml = React.renderToString(<App {...opts}/>)
+      res.render('index.ejs', {
+        props: opts,
+        reactOutput: reactHtml
+      })
+    }
+
+    if (req.session.signupBand) {
+      Band.one(req.session.signupBand, function(err, band) {
+        if (err || !band || band.hasMatch) {
+          delete req.session.signupBand
+          req.session.save(render)
+        } else {
+          opts.select = band.toObject()
+          render()
+        }
+      })
+    }
+
   })
 
   app.post('/signup', function(req, res, next) {
@@ -49,34 +69,29 @@ module.exports = function(app) {
      */
 
     var formID = req.body.formID;
-    var submissionID = req.body.submissionID;
+    var submissionID = req.body.submission_id;
 
-    var uploadURL = function(name) {
-      return 'http://www.jotform.com/uploads/rigsketball/'+formID+'/'+submissionID+'/' + name
+    var uploadURL = function(item) {
+      return 'http://www.jotform.com/uploads/Rigsketball/'+formID+'/'+submissionID+'/' + item
     }
 
     var b = {}
+    b.name = req.body.name
     b.submission = req.body
     b.photo = uploadURL(req.body.photo)
-    b.track = uploadURL(req.body.track)
+    b.track = uploadURL(req.body.trackname)
     b.soundcloud = req.body.soundcloud
     b.bandcamp = req.body.bandcamp
     b.hasMatch = false
     var band = new Band(b)
-    band.save(function(err) {
+
+    band.save(function(err, band) {
       if (err) return next(err)
-
-      var pagePath = '/'
-
-      var reactHtml = React.renderToString(<App path={pagePath} signup={true} />)
-      res.render('index.ejs', {
-        props: {
-          path: pagePath,
-          signup: true
-        },
-        reactOutput: reactHtml
+      req.session.signupBand = band._id
+      req.session.save(function(err) {
+        if (err) return next(err)
+        res.redirect('/')
       })
     })
   })
-
 }

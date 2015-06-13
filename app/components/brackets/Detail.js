@@ -36,7 +36,9 @@ module.exports = React.createClass({
       bands: [],
       bandsMap: {},
       selectedRound: null,
-      bracketMode: true
+      bracketMode: false,
+      modal: {},
+      select: this.props.select
     }
   },
   getDefaultProps() {
@@ -80,6 +82,7 @@ module.exports = React.createClass({
   loadBracket() {
     var self = this
     var loaded = function(err, bracket) {
+      if (err || !bracket) return self.setState({error: err, bracket: false})
       self.setState({
         bracket: bracket,
         error: err,
@@ -93,7 +96,6 @@ module.exports = React.createClass({
     }
   },
   saveMatch(match) {
-    if (!this.props.editMode) return
     var self = this
     new Match(match).save(function(err) {
       if (err) return self.setState({error: err})
@@ -114,17 +116,28 @@ module.exports = React.createClass({
     match.bands[position] = band._id
     this.saveMatch(match)
   },
+  removeBand(match, position, e) {
+    e.preventDefault()
+    match.bands[position] = null
+    this.saveMatch(match)
+  },
   band(band, match, position, editable) {
     var bands = this.state.bands
     band = band || {}
     var editControls
     if (this.props.editMode && editable) {
+      var remove
+      if (band._id) {
+        remove = <a href="#" onClick={this.removeBand.bind(this, match, position)}>Remove</a>
+      }
       editControls = <div>
         <Typeahead options={bands} onOptionSelected={this.selectBand.bind(this, match, position)} placeholder="change band"/>
+        {remove}
         <input type="number" defaultValue={match.scores[position]} placeholder="score" onBlur={this.updateScore.bind(this, match, position)}/>
       </div>
     }
-    var classes = 'band band' + (position+1)
+    var selectable = this.state.select && editable;
+    var classes = 'band band' + (position+1) + (selectable ? ' selectable' : '')
     var style = {}
     var backgroundCover = null
     if (band.photo) {
@@ -133,19 +146,73 @@ module.exports = React.createClass({
     }
     var bandLinks = []
     var bandLink = function(n) {
-      return <a href={band[n]}><div className={n}></div></a>
+      var link = band[n]
+      if (!/(https?:)?\/\//.test(link)) {
+        switch (n) {
+          case 'soundcloud':
+            link = 'https://soundcloud.com/' + n
+            break;
+          case 'bandcamp':
+            link = 'https://' + n + '.bandcamp.com'
+            break;
+        }
+      }
+      return <a href={link}><div className={n}></div></a>
     }
     if (band.soundcloud) bandLinks.push(bandLink('soundcloud'))
     if (band.bandcamp) bandLinks.push(bandLink('bandcamp'))
-    return <div className={classes} key={match._id + position} style={style}>
+    var info = {
+      band: band,
+      match: match,
+      position: position,
+      editable: editable
+    }
+
+    var placeholder = selectable
+                    ? 'available'
+                    : editable
+                    ? 'TBD'
+                    : 'none'
+
+    return <div className={classes} key={match._id + position} style={style} onClick={this.bandClicked.bind(this, info)}>
       {backgroundCover}
-      <p>{band.name || 'none'}</p>
+      <p>{band.name || placeholder}</p>
       <div className="links">{bandLinks}</div>
       <span className="score">{match.scores[position]}</span>
       {editControls}
       <div className="border-bottom"></div>
       <div className="border-right"></div>
     </div>
+  },
+  bandClicked(info, evt) {
+    if (this.state.select && !info.band.name) {
+
+      var band = this.state.select
+      var match = info.match
+      var self = this
+
+      var nextRounds = []
+
+
+      this.setState({modal:{
+        message: "By selecting this spot, you're letting us know you'll be free to play all the subsequent rounds if you win.",
+        confirm: "Got it",
+        cancel: "Nevermind",
+        action: function() {
+          match.bands[info.position] = band._id
+          self.setState({select: null})
+          band.hasMatch = true
+          new Band(band).save(function(err) {
+            if (err) return self.setState({error: err, modal: {}})
+            self.setState({modal: {}})
+            self.saveMatch(match)
+          })
+        }
+      }})
+    } else {
+      // TODO: expand info
+    }
+    evt.preventDefault()
   },
   updateDate(match, date, dateStr) {
     match.date = dateStr
@@ -271,15 +338,46 @@ module.exports = React.createClass({
       {items}
     </div>
   },
+  signupMessage() {
+    if (!this.state.select) return
+    var band = this.state.select
+    return <div className="signup-message">
+      <h3>Hey {band.name}, choose a match to sign up</h3>
+    </div>
+  },
+  modal() {
+    if (!this.state.modal.message || !this.state.modal.action) return
+    var title
+    if (this.state.modal.title) {
+      title = <h3>{this.state.modal.title}</h3>
+    }
+    var self = this
+    var cancel = function() {
+      self.setState({modal: {}})
+    }
+    return <div className="modal">
+      <div>
+        {title}
+        <p>{this.state.modal.message}</p>
+        <div className="buttons">
+          <button className="button cancel" onClick={cancel}>{this.state.modal.cancel || "Cancel"}</button>
+          <button className="button confirm" onClick={this.state.modal.action}>{this.state.modal.confirm || "OK"}</button>
+        </div>
+      </div>
+    </div>
+  },
   render() {
+    if (this.state.bracket === null) return <div><h5>Loading bracket...</h5></div>
     if (!this.state.bracket) return <div><h5>Bracket Not Found.</h5></div>
     var bracket = this.state.bracket || {}
     var error = this.state.error
 
     return <div className="bracket">
+      {this.signupMessage()}
       {this.roundNav()}
       <h5 className="error" style={{display: error ? 'block' : 'none'}}>{error}</h5>
       {this.rounds()}
+      {this.modal()}
     </div>
   }
 })

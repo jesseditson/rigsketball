@@ -12,5 +12,6 @@ try {
   console.error('unable to parse props.')
   throw new Error(e)
 } finally {
+  console.log('starting app with:', props)
   React.render(<App {...props}/>, mountNode)
 }

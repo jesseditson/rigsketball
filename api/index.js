@@ -8,7 +8,7 @@ var matches = require('./matches')
 router.get('/matches',matches.index)
 router.get('/matches/:id',matches.show)
 router.post('/matches',ensureLoggedIn,matches.create)
-router.put('/matches/:id',ensureLoggedIn,matches.update)
+router.put('/matches/:id',matches.update)
 router.delete('/matches/:id',ensureLoggedIn,matches.destroy)
 
 // bands resources
@@ -16,7 +16,7 @@ var bands = require('./bands')
 router.get('/bands',bands.index)
 router.get('/bands/:id',bands.show)
 router.post('/bands',ensureLoggedIn,bands.create)
-router.put('/bands/:id',ensureLoggedIn,bands.update)
+router.put('/bands/:id',bands.update)
 router.delete('/bands/:id',ensureLoggedIn,bands.destroy)
 
 // brackets resources

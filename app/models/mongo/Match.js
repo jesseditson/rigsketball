@@ -41,7 +41,7 @@ ExtendedModel.prototype.save = function() {
   // restore non-decorated data
   if (this.bands) {
     this.bands = this.bands.map(function(band) {
-      if (band._id) {
+      if (band && band._id) {
         return band._id
       } else {
         return band
