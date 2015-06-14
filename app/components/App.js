@@ -8,7 +8,8 @@ var App = React.createClass({
   getInitialState() {
     return {
       bracketName: 'pdxpopnow2015',
-      selectedPage: null
+      selectedPage: null,
+      signupEnabled: this.props.signupEnabled || true
     }
   },
   componentWillMount() {
@@ -45,10 +46,15 @@ var App = React.createClass({
     var className = function(n) {
       return self.state.selectedPage === n ? 'selected' : ''
     }
+    var signupLink
+    if (this.state.signupEnabled) {
+      signupLink = <a className="lightbox-51626431524955" style={{cursor: 'pointer'}}>Sign up!</a>
+    }
     return <div>
       <nav>
         <a href="/blog" onClick={this.selectPage.bind(this, 'blog')} className={className('blog')}>blog</a>
         <a href="/bracket" onClick={this.selectPage.bind(this, 'bracket')} className={className('bracket')}>bracket</a>
+        {signupLink}
       </nav>
       {page}
     </div>

@@ -11,21 +11,23 @@ var moment = require('moment')
 
 var dateString = function(matchDate){
   var dateString = 'TBD'
+  var className = 'oneline'
   if(matchDate) {
     var date = moment(matchDate)
-    // skip this, let's show the time always
-    if(false && date.isAfter(moment().endOf('day'))){
+    if(date.isAfter(moment().endOf('day'))){
       // not today, show the date
-      dateString = date.format('M/D')
+      dateString = date.format('M/D') + ' ' + date.format('h:mm')
+      className = 'date'
     } else if(moment().isBefore(date)) {
-      dateString = date.format('H:mm')
+      dateString = 'today ' + date.format('h:mm')
+      className = 'date'
     } else if(moment().isBefore(date.add(30,'minutes'))) {
       dateString = 'LIVE'
     } else {
       dateString = 'FINAL'
     }
   }
-  return dateString
+  return {text: dateString, class: className}
 }
 
 module.exports = React.createClass({
@@ -38,7 +40,8 @@ module.exports = React.createClass({
       selectedRound: null,
       bracketMode: false,
       modal: {},
-      select: this.props.select
+      select: this.props.select,
+      matchStates: {}
     }
   },
   getDefaultProps() {
@@ -145,22 +148,22 @@ module.exports = React.createClass({
       backgroundCover = <div className="band-background-cover"></div>
     }
     var bandLinks = []
-    var bandLink = function(n) {
-      var link = band[n]
-      if (!/(https?:)?\/\//.test(link)) {
-        switch (n) {
-          case 'soundcloud':
-            link = 'https://soundcloud.com/' + n
-            break;
-          case 'bandcamp':
-            link = 'https://' + n + '.bandcamp.com'
-            break;
-        }
-      }
-      return <a href={link}><div className={n}></div></a>
-    }
-    if (band.soundcloud) bandLinks.push(bandLink('soundcloud'))
-    if (band.bandcamp) bandLinks.push(bandLink('bandcamp'))
+    // var bandLink = function(n) {
+    //   var link = band[n]
+    //   if (!/(https?:)?\/\//.test(link)) {
+    //     switch (n) {
+    //       case 'soundcloud':
+    //         link = 'https://soundcloud.com/' + link
+    //         break;
+    //       case 'bandcamp':
+    //         link = 'https://' + link + '.bandcamp.com'
+    //         break;
+    //     }
+    //   }
+    //   return <a href={link}><div className={n}></div></a>
+    // }
+    // if (band.soundcloud) bandLinks.push(bandLink('soundcloud'))
+    // if (band.bandcamp) bandLinks.push(bandLink('bandcamp'))
     var info = {
       band: band,
       match: match,
@@ -234,27 +237,50 @@ module.exports = React.createClass({
       this.saveMatch(match)
     }
   },
+  toggleOpen(match) {
+    var i = {}
+    i[match._id] = !this.state.matchStates[match._id]
+    this.setState({matchStates: i})
+  },
   match(editable, match) {
-    var editControls
+    var info
+    var date = match.date ? new Date(match.date) : null
     if (this.props.editMode) {
-      var date = match.date ? new Date(match.date) : null
       editControls = <div className="date-picker">
         <DateTimePicker ref={match._id + '-date'} defaultValue={date} onChange={this.updateDate.bind(this, match)} />
         <input type="text" ref={match._id + '-location'} placeholder='location' defaultValue={match.location} onBlur={this.updateInfo.bind(this, match)} />
         <textarea ref={match._id + '-info'} defaultValue={match.info} placeholder='info' onBlur={this.updateInfo.bind(this, match)} />
       </div>
+    } else {
+      var bands
+      if (match.bands[0] && match.bands[1]) {
+        bands = <div className="vs">
+          <h3>{match.bands[0].name}</h3>
+          <span>vs</span>
+          <h3>{match.bands[1].name}</h3>
+        </div>
+      }
+      info = <div className="info">
+        {bands}
+        <a href="#" onClick={this.toggleOpen.bind(this, match)} className="close">✕</a>
+        <h4>Date: <span>{match.date}</span></h4>
+        <h4>Location: <span>{match.location}</span></h4>
+        <p>{match.info}</p>
+      </div>
     }
 
-    var bubbleText = dateString(match.date)
+    var bubble = dateString(match.date)
 
-    var classes = this.props.editMode ? 'match-edit' : 'match'
+    var classes = (this.props.editMode ? 'match-edit' : 'match') + (this.state.matchStates[match._id] ? ' open' : ' closed')
 
     return <div className={classes} key={match._id}>
       {this.band(match.bands[0], match, 0, editable)}
       {this.band(match.bands[1], match, 1, editable)}
-      {editControls}
-      <div className="bubble">
-        {bubbleText}
+      {info}
+      <div className="bubble" onClick={this.toggleOpen.bind(this, match)}>
+        <span className={bubble.class}>
+          {bubble.text}
+        </span>
       </div>
     </div>
   },
@@ -316,7 +342,7 @@ module.exports = React.createClass({
       var text = 'Round of ' + k
       switch(k) {
         case '16':
-          text = 'Sweet 16'
+          text = 'Sweat 16'
           break
         case '8':
           text = 'Elite 8'

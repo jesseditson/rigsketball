@@ -40,12 +40,12 @@ footer {
   margin-bottom: 20px;
 }
 
-nav a {
+#main-mount nav a {
   font-size: 0.7em;
 }
-
+/*
 @media (min-width: 1025px) {
-  nav {
+  #main-mount nav {
     position: absolute;
     left: -100px;
     width: 100px;
@@ -62,17 +62,18 @@ nav a {
   }
 }
 
-@media (max-width: 1024px) {
-  nav {
-    display:flex;
-    text-align: center;
-    a {
-      flex-grow: 1;
-      margin-bottom: 10px;
-      border-bottom: 3px solid transparent;
-      &.selected, &:hover {
-        border-bottom: 3px solid $darkorange;
-      }
+
+@media (max-width: 1024px) {*/
+
+#main-mount nav {
+  display:flex;
+  text-align: center;
+  a {
+    flex-grow: 1;
+    margin-bottom: 10px;
+    border-bottom: 3px solid transparent;
+    &.selected, &:hover {
+      border-bottom: 3px solid $darkorange;
     }
   }
 }
@@ -164,8 +165,15 @@ h2.script {
     vertical-align: middle;
     border-radius: 50%;
     border: 3px solid;
-    line-height: 80px;
+    line-height: 30px;
     cursor: pointer;
+    span.date {
+      position: relative;
+      top: 12px;
+    }
+    span.oneline {
+      line-height: 80px;
+    }
   }
 }
 
@@ -290,7 +298,61 @@ button {
   }
 }
 
+.match .info {
+  display: none;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  background-color: $offwhite;
+  color: $ash;
+
+  h4, p {
+    margin: 0.2em 0.6em;
+  }
+  .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  .vs {
+    display: flex;
+    text-align: center;
+    height:55px;
+    line-height: 25px;
+    & > * {
+      flex-grow: 1;
+    }
+    & h3 {
+      font-size: 0.8em;
+    }
+    & span {
+      font-size: 0.6em;
+      padding: 25px 0px;
+    }
+  }
+}
+
+.match.open .info {
+  display: block;
+}
+
+.match.open .band {
+  margin-bottom: 0px;
+}
+
+.match.open .bubble {
+  @include transition(all .3s ease-in-out);
+  @include opacity(0);
+  width:0px;
+  height:0px;
+  margin-left: 0px;
+  margin-top: 0px;
+}
+
 .match .band {
+  @include transition(all .2s ease-in-out);
   height: 80px;
   .band-background-cover {
     width: 100%;
