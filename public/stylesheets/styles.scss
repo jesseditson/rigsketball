@@ -78,7 +78,6 @@ footer {
   }
 }
 
-
 h1 {
   font-family: 'nexa_rust_sansblack';
   color: $cyan;
@@ -422,5 +421,12 @@ button {
       font-size: 0.8em;
       padding: 10px;
     }
+  }
+}
+
+.available-date {
+  font-size: 0.4em;
+  p {
+    font-size: 1.6em;
   }
 }

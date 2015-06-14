@@ -44,14 +44,18 @@ var decorateBracket = function(bracket,callback){
 
 }
 
+brackets.decoratedByName = function(name, callback) {
+  Bracket.one({name : name},function(err,bracket){
+    if(err || !bracket) return callback(err || new Error('Bracket not found.'))
+    decorateBracket(bracket, callback)
+  })
+}
+
 brackets.index = function(req,res,next){
   if(req.query.name){
-    Bracket.one({name : req.query.name},function(err,bracket){
-      if(err || !bracket) return res.status(500).json({error : err && err.message || 'Bracket not found.'})
-      decorateBracket(bracket,function(err,bracket){
-        if(err) return res.status(500).json({error : err.message})
-        res.json(bracket)
-      })
+    brackets.decoratedByName(req.query.name, function(err, bracket) {
+      if(err) return res.status(500).json({error : err.message})
+      res.json(bracket)
     })
   } else {
     Bracket.all(function(err,items){

@@ -36,6 +36,14 @@ router.post('/users',ensureLoggedIn,users.create)
 router.put('/users/:id',ensureLoggedIn,users.update)
 router.delete('/users/:id',ensureLoggedIn,users.destroy)
 
+// site resources
+var site = require('./site')
+router.get('/sites',site.index)
+router.get('/sites/:id',site.show)
+router.post('/sites',ensureLoggedIn,site.create)
+router.put('/sites/:id',ensureLoggedIn,site.update)
+router.delete('/sites/:id',ensureLoggedIn,site.destroy)
+
 
 
 /* end mise api routes */

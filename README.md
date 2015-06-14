@@ -56,6 +56,8 @@ TUMBLR_KEY=somekey
 TUMBLR_SECRET=somesecret
 # subdomain to point the blog to
 TUMBLR_SUBDOMAIN=rigsketball
+# default bracket - this is used to load the bracket page and decide when the signup link is available
+DEFAULT_BRACKET=pdxpopnow2015
 ```
 
 To provision the inventory, run `./provision` from the root of this repo after creating the above files.

@@ -3,14 +3,35 @@
 var React = require('react')
 var Bracket = require('./brackets/Detail')
 var Tumblr = require('./Tumblr')
+var Site = require('../models/rest/Site')
+var moment = require('moment')
 
 var App = React.createClass({
   getInitialState() {
     return {
       bracketName: 'pdxpopnow2015',
       selectedPage: null,
-      signupEnabled: this.props.signupEnabled || true
+      signupEnabled: this.props.signupEnabled || false,
+      site: {}
     }
+  },
+  componentDidMount() {
+    var self = this
+    Site.site(function(err, site) {
+      var signupEnabled = self.props.signupEnabled
+      var signupDate = moment(new Date(site.signupDate))
+      if (signupDate.isBefore(moment(new Date()))) {
+        signupEnabled = !site.full
+      }
+      self.setState({
+        error: err,
+        site: site,
+        signupEnabled: signupEnabled
+      })
+      if (self.props.signupEnabled) {
+        self.showForm()
+      }
+    })
   },
   componentWillMount() {
     var ns = {}
@@ -32,6 +53,9 @@ var App = React.createClass({
       this.setState({selectedPage: page})
     }
   },
+  showForm() {
+    window.JFL_51626431524955.showForm()
+  },
   render() {
     var page
     switch (this.state.selectedPage) {
@@ -48,7 +72,7 @@ var App = React.createClass({
     }
     var signupLink
     if (this.state.signupEnabled) {
-      signupLink = <a className="lightbox-51626431524955" style={{cursor: 'pointer'}}>Sign up!</a>
+      signupLink = <a style={{cursor: 'pointer'}} onClick={this.showForm}>Sign up!</a>
     }
     return <div>
       <nav>

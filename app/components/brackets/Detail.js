@@ -196,7 +196,6 @@ module.exports = React.createClass({
 
       var nextRounds = []
 
-
       this.setState({modal:{
         message: "By selecting this spot, you're letting us know you'll be free to play all the subsequent rounds if you win.",
         confirm: "Got it",
@@ -237,7 +236,8 @@ module.exports = React.createClass({
       this.saveMatch(match)
     }
   },
-  toggleOpen(match) {
+  toggleOpen(match, evt) {
+    evt.preventDefault()
     var i = {}
     i[match._id] = !this.state.matchStates[match._id]
     this.setState({matchStates: i})
