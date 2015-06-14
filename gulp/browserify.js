@@ -15,7 +15,7 @@ var browserifyTask = function(devMode, admin) {
   var b = browserify({
     entries: ['app/' + file],
     debug: devMode,
-    transform: [reactify]
+    transform: [[reactify, {es6: true}]]
   })
 
   var bundle = function() {

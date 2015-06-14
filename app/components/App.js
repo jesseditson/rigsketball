@@ -18,6 +18,7 @@ var App = React.createClass({
       currentTrack: null
     }
   },
+  playedTracks: {},
   componentDidMount() {
     var self = this
     Site.site(function(err, site) {
@@ -68,7 +69,19 @@ var App = React.createClass({
     tracks = tracks || this.state.tracks
     var keys = Object.keys(tracks)
     var trackNum = Math.floor(Math.random() * keys.length)
-    return tracks[keys[trackNum]]
+    var id = keys[trackNum]
+    if (Object.keys(this.playedTracks).length === keys.length) {
+      this.playedTracks = {}
+    }
+    if (this.playedTracks[id]) {
+      return this.randomTrack(tracks)
+    } else {
+      this.playedTracks[id] = true
+      return tracks[id]
+    }
+  },
+  componentDidUpdate() {
+    if (this.refs.player) this.refs.player.sync()
   },
   render() {
     var page
@@ -91,10 +104,10 @@ var App = React.createClass({
     var currentTrack = this.state.currentTrack
     var player
     if (currentTrack) {
-      // player = <div className="player">
-      //   <Player src={currentTrack.file} title={currentTrack.name} autoPlay={true} artist={currentTrack.band} artwork={currentTrack.cover}/>
-      //   <a onClick={this.randomizeTrack}>↺</a>
-      // </div>
+      player = <div className="player">
+        <Player ref='player' src={currentTrack.file} title={currentTrack.name} autoPlay={true} onEnd={this.randomizeTrack} artist={currentTrack.band} artwork={currentTrack.cover}/>
+        <a className="random" onClick={this.randomizeTrack}>▶▶</a>
+      </div>
     }
     return <div>
       {player}

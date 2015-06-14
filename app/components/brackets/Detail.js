@@ -247,7 +247,7 @@ module.exports = React.createClass({
     var date = match.date ? new Date(match.date) : null
     if (this.props.editMode) {
       info = <div className="date-picker">
-        <DateTimePicker ref={match._id + '-date'} defaultValue={date} onChange={this.updateDate.bind(this, match)} />
+        <DateTimePicker ref={match._id + '-date'} defaultValue={date} step={10} onChange={this.updateDate.bind(this, match)} />
         <input type="text" ref={match._id + '-location'} placeholder='location' defaultValue={match.location} onBlur={this.updateInfo.bind(this, match)} />
         <textarea ref={match._id + '-info'} defaultValue={match.info} placeholder='info' onBlur={this.updateInfo.bind(this, match)} />
       </div>

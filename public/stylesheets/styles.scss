@@ -7,12 +7,9 @@
 @import 'compass/css3/opacity';
 @import 'compass/css3/box-sizing';
 @import "compass/css3/transition";
-
-$ash: #655643;
-$cyan: #80BCA3;
-$offwhite: #F6F7BD;
-$orange: #E6AC27;
-$darkorange: #BF4D28;
+@import 'compass/css3/flexbox';
+@import './vars';
+@import './player';
 
 body {
   background-color: $ash;
@@ -66,10 +63,10 @@ footer {
 @media (max-width: 1024px) {*/
 
 #main-mount nav {
-  display:flex;
+  @include display-flex;
   text-align: center;
   a {
-    flex-grow: 1;
+    @include flex-grow(1);
     margin-bottom: 10px;
     border-bottom: 3px solid transparent;
     &.selected, &:hover {
@@ -126,11 +123,11 @@ h2.script {
 }
 
 .bracket .round-nav {
-  display: flex;
+  @include display-flex;
   margin-top:10px;
   a {
     font-size: 0.8em;
-    flex-grow: 1;
+    @include flex-grow(1);
     color: $orange;
     text-align: center;
     text-decoration: none;
@@ -316,12 +313,12 @@ button {
     right: 10px;
   }
   .vs {
-    display: flex;
+    @include display-flex;
     text-align: center;
     height:55px;
     line-height: 25px;
     & > * {
-      flex-grow: 1;
+      @include flex-grow(1);
     }
     & h3 {
       font-size: 0.8em;
