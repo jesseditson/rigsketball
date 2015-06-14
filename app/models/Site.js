@@ -10,6 +10,12 @@ var Site = module.exports = new Model('Site',{
   },
   signupDate: {
     type: String
+  },
+  tracks: {
+    type: 'Any'
+  },
+  full: {
+    type: Boolean
   }
 }
 ,'sites');

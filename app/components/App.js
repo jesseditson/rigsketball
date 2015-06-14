@@ -5,6 +5,7 @@ var Bracket = require('./brackets/Detail')
 var Tumblr = require('./Tumblr')
 var Site = require('../models/rest/Site')
 var moment = require('moment')
+var Player = require('./player/Player')
 
 var App = React.createClass({
   getInitialState() {
@@ -12,7 +13,9 @@ var App = React.createClass({
       bracketName: 'pdxpopnow2015',
       selectedPage: null,
       signupEnabled: this.props.signupEnabled || false,
-      site: {}
+      site: {},
+      tracks: {},
+      currentTrack: null
     }
   },
   componentDidMount() {
@@ -26,7 +29,9 @@ var App = React.createClass({
       self.setState({
         error: err,
         site: site,
-        signupEnabled: signupEnabled
+        signupEnabled: signupEnabled,
+        tracks: site.tracks,
+        currentTrack: self.randomTrack(site.tracks)
       })
       if (self.props.signupEnabled) {
         self.showForm()
@@ -56,6 +61,15 @@ var App = React.createClass({
   showForm() {
     window.JFL_51626431524955.showForm()
   },
+  randomizeTrack() {
+    this.setState({ currentTrack : this.randomTrack() })
+  },
+  randomTrack(tracks) {
+    tracks = tracks || this.state.tracks
+    var keys = Object.keys(tracks)
+    var trackNum = Math.floor(Math.random() * keys.length)
+    return tracks[keys[trackNum]]
+  },
   render() {
     var page
     switch (this.state.selectedPage) {
@@ -74,7 +88,16 @@ var App = React.createClass({
     if (this.state.signupEnabled) {
       signupLink = <a style={{cursor: 'pointer'}} onClick={this.showForm}>Sign up!</a>
     }
+    var currentTrack = this.state.currentTrack
+    var player
+    if (currentTrack) {
+      // player = <div className="player">
+      //   <Player src={currentTrack.file} title={currentTrack.name} autoPlay={true} artist={currentTrack.band} artwork={currentTrack.cover}/>
+      //   <a onClick={this.randomizeTrack}>↺</a>
+      // </div>
+    }
     return <div>
+      {player}
       <nav>
         <a href="/blog" onClick={this.selectPage.bind(this, 'blog')} className={className('blog')}>blog</a>
         <a href="/bracket" onClick={this.selectPage.bind(this, 'bracket')} className={className('bracket')}>bracket</a>

@@ -1,4 +1,5 @@
 var Site = require('../app/models/mongo/Site')
+var Band = require('../app/models/mongo/Band')
 var brackets = require('./brackets')
 var site = {}
 
@@ -9,16 +10,31 @@ site.index = function(req,res,next){
     Site.one({name : req.query.name},function(err,site){
       if(err || !site) return res.status(500).json({error : err && err.message || 'Site '+req.query.name+' not found.'})
       var defaultBracket = process.env.DEFAULT_BRACKET || 'rigsketball'
-      brackets.decoratedByName(defaultBracket, function(err, bracket) {
+      Band.all(function(err, bands) {
         if (err) return res.status(500).json({error : err.message})
-        if (!bracket) return res.json(site)
-        var firstRound = Math.max.apply(Math, Object.keys(bracket.rounds).map(Number))
-        var matches = bracket.rounds[firstRound]
-        var available = matches.some(function(match) {
-          return !match.bands[0] || !match.bands[1]
+        site.tracks = bands.reduce(function(o, band) {
+          if (!band.track) return o
+          var trackName = band.track.match(/\/([^\.\/]+)\.\w+$/)
+          trackName = trackName ? trackName[1] : 'untitled'
+          o[band._id] = {
+            file: band.track,
+            cover: band.photo,
+            name: trackName,
+            band: band.name
+          }
+          return o
+        }, {})
+        brackets.decoratedByName(defaultBracket, function(err, bracket) {
+          if (err) return res.status(500).json({error : err.message})
+          if (!bracket) return res.json(site)
+          var firstRound = Math.max.apply(Math, Object.keys(bracket.rounds).map(Number))
+          var matches = bracket.rounds[firstRound]
+          var available = matches.some(function(match) {
+            return !match.bands[0] || !match.bands[1]
+          })
+          site.full = !available
+          res.json(site)
         })
-        site.full = !available
-        res.json(site)
       })
     })
   } else {
