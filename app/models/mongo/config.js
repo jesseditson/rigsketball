@@ -12,4 +12,6 @@ if (process.env.DB_USER) {
   config.password = process.env.DB_PASSWORD
 }
 
+console.log('connecting to db with config: ', config)
+
 module.exports = config;
