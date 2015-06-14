@@ -339,19 +339,19 @@ module.exports = React.createClass({
     var bracketName = this.state.bracket.name
     var items = this.roundNums().map(function(k) {
       var link = '/brackets/' + bracketName + '/rounds/' + k
-      var text = 'Round of ' + k
+      var text = 'Round of ' + (k * 2)
       switch(k) {
         case '16':
-          text = 'Sweat 16'
+          text = 'First Round'
           break
         case '8':
-          text = 'Elite 8'
+          text = 'Sweat 16'
           break
         case '4':
-          text = 'Final Four'
+          text = 'Elite 8'
           break
         case '2':
-          text = 'Semifinal'
+          text = 'Final Four'
           break
         case '1':
           text = 'Final'
