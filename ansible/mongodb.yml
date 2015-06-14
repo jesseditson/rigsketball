@@ -9,5 +9,24 @@
     - name: restart sshd
       service: name=sshd state=restarted
 
+    - name: enable firewalld
+      service: name=firewalld state=started enabled=yes
+
+    - name: open port 27017
+      shell: firewall-cmd --permanent --zone=public --add-port=27017/tcp
+      tags: mongodb
+
+    - name: open port 28017 (web console)
+      shell: firewall-cmd --permanent --zone=public --add-port=28017/tcp
+      tags: mongodb
+
+    {% for host in groups['app'] %}
+    - name: whitelist app servers
+      shell: firewall-cmd --permanent --zone=public --add-source={{host}}/32
+    {% endfor %}
+
+    - name: restart firewalld
+      shell: firewall-cmd --reload
+
   roles:
     - mongodb
