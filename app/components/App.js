@@ -62,6 +62,10 @@ var App = React.createClass({
   showForm() {
     window.JFL_51626431524955.showForm()
   },
+  trackFinished() {
+    this.shouldPlayNext = true
+    this.randomizeTrack()
+  },
   randomizeTrack() {
     this.setState({ currentTrack : this.randomTrack() })
   },
@@ -81,7 +85,11 @@ var App = React.createClass({
     }
   },
   componentDidUpdate() {
-    if (this.refs.player) this.refs.player.sync()
+    if (this.refs.player) {
+      if (this.shouldPlayNext) this.refs.player.setPlaying(true)
+      this.refs.player.sync()
+    }
+    this.shouldPlayNext = false
   },
   render() {
     var page
@@ -105,7 +113,7 @@ var App = React.createClass({
     var player
     if (currentTrack) {
       player = <div className="player">
-        <Player ref='player' src={currentTrack.file} title={currentTrack.name} autoPlay={true} onEnd={this.randomizeTrack} artist={currentTrack.band} artwork={currentTrack.cover}/>
+        <Player ref='player' src={currentTrack.file} title={currentTrack.name} autoPlay={true} onEnd={this.trackFinished} artist={currentTrack.band} artwork={currentTrack.cover}/>
         <a className="random" onClick={this.randomizeTrack}>▶▶</a>
       </div>
     }
