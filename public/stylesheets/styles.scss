@@ -1,3 +1,4 @@
+@import url(http://fonts.googleapis.com/css?family=Alegreya:400,700,900);
 @import '../stylesheets/fonts/NexaRustBlack/stylesheet.css';
 @import '../stylesheets/fonts/NexaRustBlackShadow/stylesheet.css';
 @import '../stylesheets/fonts/NexaRustScriptLight00/stylesheet.css';
@@ -31,6 +32,52 @@ a {
   }
 }
 
+footer {
+  font-family: "Helvetica Neue";
+  font-weight: 100;
+  text-align: center;
+  font-size: 0.5em;
+  margin-bottom: 20px;
+}
+
+nav a {
+  font-size: 0.7em;
+}
+
+@media (min-width: 1025px) {
+  nav {
+    position: absolute;
+    left: -100px;
+    width: 100px;
+    a {
+      float: right;
+      clear: both;
+      margin-bottom: 20px;
+      padding-right: 20px;
+      border-right: 3px solid transparent;
+      &.selected, &:hover {
+        border-right: 3px solid $darkorange;
+      }
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  nav {
+    display:flex;
+    text-align: center;
+    a {
+      flex-grow: 1;
+      margin-bottom: 10px;
+      border-bottom: 3px solid transparent;
+      &.selected, &:hover {
+        border-bottom: 3px solid $darkorange;
+      }
+    }
+  }
+}
+
+
 h1 {
   font-family: 'nexa_rust_sansblack';
   color: $cyan;
@@ -42,6 +89,7 @@ h1 {
 }
 
 h2.script {
+  z-index: 100;
   font-family: 'trash-hand';
   @include transform( rotate(-10deg) );
   position:absolute;
@@ -65,6 +113,12 @@ h2.script {
   width: 100%;
   max-width: 800px;
   margin: auto;
+  position:relative;
+}
+
+.blog {
+  font-family: 'Alegreya', serif;
+  font-size: 0.8em;
 }
 
 .bracket {
@@ -186,7 +240,7 @@ button {
   }
 }
 
-.band {
+.band, .post {
   position: relative;
   background-position: 0px -200px;
   background-repeat: no-repeat;
@@ -195,6 +249,9 @@ button {
   background-color: $offwhite;
   padding: 20px 0px;
   margin-bottom: 15px;
+}
+
+.band {
   p, span {
     color: $ash;
     text-shadow:
@@ -209,6 +266,27 @@ button {
     right: 20px;
     top:30%;
     font-size: 2em;
+  }
+}
+
+.match .band, .post {
+  .border-bottom {
+    background-color: adjust-lightness($darkorange, -10);
+    @include transform( skewX(55deg) );
+    height: 10px;
+    position: absolute;
+    left: 6px;
+    bottom: -10px;
+    width: 100%;
+  }
+  .border-right {
+    background-color: $darkorange;
+    @include transform( skewY(40deg) );
+    height: 100%;
+    position: absolute;
+    right: -10px;
+    width: 10px;
+    top: 4px;
   }
 }
 
@@ -260,22 +338,27 @@ button {
   .bandcamp {
     background-image: url('/img/bandcamp.png');
   }
-  .border-bottom {
-    background-color: adjust-lightness($darkorange, -10);
-    @include transform( skewX(55deg) );
-    height: 10px;
-    position: absolute;
-    left: 6px;
-    bottom: -10px;
-    width: 100%;
-  }
-  .border-right {
-    background-color: $darkorange;
-    @include transform( skewY(40deg) );
-    height: 100%;
-    position: absolute;
-    right: -10px;
-    width: 10px;
-    top: 4px;
+}
+
+.blog {
+  margin-top: 20px;
+
+  .post {
+    padding: 20px;
+    color: $ash;
+    font-size: 0.8em;
+    margin-bottom: 20px;
+
+    .image img {
+      width: 100%;
+    }
+    .date {
+      font-family: "trash-hand";
+    }
+    .post-url, .date {
+      float:right;
+      font-size: 0.8em;
+      padding: 10px;
+    }
   }
 }

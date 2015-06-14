@@ -47,9 +47,9 @@ var decorateBracket = function(bracket,callback){
 brackets.index = function(req,res,next){
   if(req.query.name){
     Bracket.one({name : req.query.name},function(err,bracket){
-      if(err || !bracket) return next(err)
+      if(err || !bracket) return res.status(500).json({error : err && err.message || 'Bracket not found.'})
       decorateBracket(bracket,function(err,bracket){
-        if(err) return next(err)
+        if(err) return res.status(500).json({error : err.message})
         res.json(bracket)
       })
     })

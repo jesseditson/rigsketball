@@ -51,6 +51,11 @@ DB_HOST={{host}}
 DB_PORT=27017
 # number of workers to run in the node cluster. Should be the # of cpus on the FE server, but no less than 2 (for continuous deployment).
 WORKER_COUNT=2
+# tumblr key/secret for showing the blog
+TUMBLR_KEY=somekey
+TUMBLR_SECRET=somesecret
+# subdomain to point the blog to
+TUMBLR_SUBDOMAIN=rigsketball
 ```
 
 To provision the inventory, run `./provision` from the root of this repo after creating the above files.

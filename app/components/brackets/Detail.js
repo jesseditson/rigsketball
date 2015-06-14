@@ -171,8 +171,8 @@ module.exports = React.createClass({
     var placeholder = selectable
                     ? 'available'
                     : editable
-                    ? 'TBD'
-                    : 'none'
+                    ? 'none'
+                    : 'TBD'
 
     return <div className={classes} key={match._id + position} style={style} onClick={this.bandClicked.bind(this, info)}>
       {backgroundCover}

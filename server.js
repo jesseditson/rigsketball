@@ -10,7 +10,7 @@ var session = require('express-session')
 var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 var MongoStore = require('connect-mongo')(session)
-
+var tumblr = require('./app/routes/tumblr');
 
 var port = process.env.APP_PORT || 4444
 var address = process.env.APP_IP || '127.0.0.1'
@@ -64,6 +64,9 @@ app.use(require('./api/auth/middleware'))
 
 // set up api
 app.use('/api', require('./api'))
+
+// tumblr endpoint
+app.use('/tumblr',tumblr)
 
 // Set up Routes for the application
 require('./app/routes/core-routes.js')(app)

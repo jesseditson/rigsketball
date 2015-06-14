@@ -2,6 +2,7 @@ var React = require('react')
 var App = require('../components/App')
 var Admin = require('../components/admin/App')
 var Band = require('../models/mongo/Band')
+var tumblr = require('../lib/tumblr')
 
 module.exports = function(app) {
 
@@ -16,7 +17,7 @@ module.exports = function(app) {
   app.get('/admin/*?', admin)
   app.get('/admin', admin)
 
-  app.get('/*?', function(req, res) {
+  app.get('/*?', function(req, res, next) {
     // React.renderToString takes your component
     // and generates the markup
     var pagePath = req.params[0] ? req.params[0].replace(/\/$/,'') : ''
@@ -26,10 +27,13 @@ module.exports = function(app) {
     }
 
     var render = function() {
-      var reactHtml = React.renderToString(<App {...opts}/>)
-      res.render('index.ejs', {
-        props: opts,
-        reactOutput: reactHtml
+      tumblr.posts({}, function(err, data) {
+        if (err) return next(err)
+        var reactHtml = React.renderToString(<App {...opts} tumblrData={data}/>)
+        res.render('index.ejs', {
+          props: opts,
+          reactOutput: reactHtml
+        })
       })
     }
 
@@ -43,6 +47,8 @@ module.exports = function(app) {
           render()
         }
       })
+    } else {
+      render()
     }
 
   })

@@ -28,7 +28,8 @@
     "react-typeahead": "^1.0.7",
     "react-widgets": "^2.6.2",
     "serve-favicon": "^2.2.1",
-    "superagent": "^1.2.0"
+    "superagent": "^1.2.0",
+    "tumblr": "^0.4.1"
   },
   "scripts": {
     "start": "gulp"
