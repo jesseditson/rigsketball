@@ -12,18 +12,18 @@
     - name: enable firewalld
       service: name=firewalld state=started enabled=yes
 
+    - name: set default zone to trusted
+      shell: firewall-cmd --set-default-zone=trusted
+
     - name: open port 27017
-      shell: firewall-cmd --permanent --zone=public --add-port=27017/tcp
-      tags: mongodb
+      shell: firewall-cmd --permanent --zone=trusted --add-port=27017/tcp
 
-    - name: open port 28017 (web console)
-      shell: firewall-cmd --permanent --zone=public --add-port=28017/tcp
-      tags: mongodb
+    # - name: open port 28017 (web console)
+    #   shell: firewall-cmd --permanent --zone=trusted --add-port=28017/tcp
 
-    {% for host in groups['app'] %}
     - name: whitelist app servers
-      shell: firewall-cmd --permanent --zone=public --add-source={{host}}/32
-    {% endfor %}
+      shell: firewall-cmd --permanent --zone=trusted --add-source={{ item }}/32
+      with_items: groups['app']
 
     - name: restart firewalld
       shell: firewall-cmd --reload
