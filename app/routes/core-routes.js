@@ -3,6 +3,7 @@ var App = require('../components/App')
 var Admin = require('../components/admin/App')
 var Band = require('../models/mongo/Band')
 var tumblr = require('../lib/tumblr')
+var ensureLoggedIn = require('../../api/auth/ensureLoggedIn')
 
 module.exports = function(app) {
 
@@ -14,8 +15,8 @@ module.exports = function(app) {
       reactOutput: reactHtml
     })
   }
-  app.get('/admin/*?', admin)
-  app.get('/admin', admin)
+  app.get('/admin/*?', ensureLoggedIn, admin)
+  app.get('/admin', ensureLoggedIn, admin)
 
   app.get('/*?', function(req, res, next) {
     // React.renderToString takes your component

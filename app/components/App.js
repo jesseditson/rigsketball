@@ -95,7 +95,7 @@ var App = React.createClass({
     var page
     switch (this.state.selectedPage) {
       case 'bracket':
-        page = <Bracket bracketName={this.state.bracketName} {...this.props}/>
+        page = <Bracket bracketName={this.state.bracketName} {...this.props} {...this.state}/>
         break
       default:
         page = <Tumblr {...this.props} />
