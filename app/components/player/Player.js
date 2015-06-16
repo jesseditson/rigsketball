@@ -81,6 +81,12 @@ var Player = React.createClass({
         duration: Math.floor(audioTag.duration*10)/10,
         position: Math.floor(audioTag.currentTime*10)/10
       });
+      if (this.props.onPlayhead) {
+        this.props.onPlayhead({
+          duration: this.state.duration,
+          position: this.state.position
+        })
+      }
     }
   },
 

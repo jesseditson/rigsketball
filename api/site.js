@@ -17,6 +17,7 @@ site.index = function(req,res,next){
           var trackName = band.track.match(/\/([^\.\/]+)\.\w+$/)
           trackName = trackName ? trackName[1] : 'untitled'
           o[band._id] = {
+            id: band._id,
             file: band.track,
             cover: band.photo,
             name: trackName,

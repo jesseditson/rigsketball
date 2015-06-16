@@ -84,6 +84,15 @@ var App = React.createClass({
       return tracks[id]
     }
   },
+  playBand(id) {
+    var next = this.state.tracks[id]
+    if (next.id === this.state.currentTrack.id) {
+      this.refs.player.toggle()
+    } else if (next) {
+      this.setState({currentTrack: next})
+    }
+    this.playheadUpdated(this.refs.player.state)
+  },
   componentDidUpdate() {
     if (this.refs.player) {
       if (this.shouldPlayNext) this.refs.player.setPlaying(true)
@@ -91,16 +100,12 @@ var App = React.createClass({
     }
     this.shouldPlayNext = false
   },
-  render() {
-    var page
-    switch (this.state.selectedPage) {
-      case 'bracket':
-        page = <Bracket bracketName={this.state.bracketName} {...this.props} {...this.state}/>
-        break
-      default:
-        page = <Tumblr {...this.props} />
-        break
+  playheadUpdated: function(opts) {
+    if (this.refs.bracket && this.refs.player) {
+      this.refs.bracket.updatePlayerTime(this.state.currentTrack, opts.position / opts.duration, this.refs.player.state.playing)
     }
+  },
+  render() {
     var self = this
     var className = function(n) {
       return self.state.selectedPage === n ? 'selected' : ''
@@ -110,13 +115,25 @@ var App = React.createClass({
       signupLink = <a style={{cursor: 'pointer'}} onClick={this.showForm}>Sign up!</a>
     }
     var currentTrack = this.state.currentTrack
-    var player
+    var player, playerEl
     if (currentTrack) {
+      playerEl = <Player ref='player' src={currentTrack.file} title={currentTrack.name} autoPlay={true} onEnd={this.trackFinished} artist={currentTrack.band} artwork={currentTrack.cover} onPlayhead={this.playheadUpdated}/>
       player = <div className="player">
-        <Player ref='player' src={currentTrack.file} title={currentTrack.name} autoPlay={true} onEnd={this.trackFinished} artist={currentTrack.band} artwork={currentTrack.cover}/>
+        {playerEl}
         <a className="random" onClick={this.randomizeTrack}>▶▶</a>
       </div>
     }
+
+    var page
+    switch (this.state.selectedPage) {
+      case 'bracket':
+        page = <Bracket ref="bracket" bracketName={this.state.bracketName} playBand={this.playBand} {...this.props} {...this.state}/>
+        break
+      default:
+        page = <Tumblr {...this.props} />
+        break
+    }
+
     return <div>
       {player}
       <nav>

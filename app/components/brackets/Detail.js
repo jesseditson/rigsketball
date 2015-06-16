@@ -44,6 +44,7 @@ module.exports = React.createClass({
       matchStates: {}
     }
   },
+  currentTrackId: null,
   getDefaultProps() {
     return {
       editMode: false,
@@ -53,6 +54,36 @@ module.exports = React.createClass({
   componentDidMount() {
     this.loadBracket()
     this.loadBands()
+  },
+  updatePlayerTime(currentTrack, trackPercent, isPlaying) {
+    if (currentTrack && trackPercent) {
+      if (currentTrack.id !== this.currentTrackId || this.playing !== isPlaying) {
+        this.currentTrackId = currentTrack.id
+        this.playing = isPlaying
+        var self = this
+        Object.keys(this.refs).forEach(function(r) {
+          var m
+          if (m = r.match(/^(.+)-playhead$/)) {
+            var id = m[1]
+            var playing = id == self.currentTrackId
+            self.refs[r].getDOMNode().style.width = '0%'
+            var list = self.refs[id + '-playcontrol'].getDOMNode().classList
+            if (playing && isPlaying) {
+              list.remove('play')
+              list.add('pause')
+            } else {
+              list.add('play')
+              list.remove('pause')
+            }
+          }
+        })
+      }
+      var playheadRef = this.props.currentTrack.id + '-playhead'
+      var playhead = this.refs[playheadRef]
+      if (playhead) {
+        playhead.getDOMNode().style.width = (trackPercent * 100) + '%'
+      }
+    }
   },
   loadBands() {
     var self = this
@@ -124,6 +155,11 @@ module.exports = React.createClass({
     match.bands[position] = null
     this.saveMatch(match)
   },
+  playBand(id) {
+    if (this.props.playBand) {
+      this.props.playBand(id)
+    }
+  },
   band(band, match, position, editable) {
     var bands = this.state.bands
     band = band || {}
@@ -147,6 +183,7 @@ module.exports = React.createClass({
       style.backgroundImage = "url('"+band.photo+"')"
       backgroundCover = <div className="band-background-cover"></div>
     }
+    var playhead = <div ref={band._id + '-playhead'} className="band-background-cover playhead"></div>
     var bandLinks = []
     // var bandLink = function(n) {
     //   var link = band[n]
@@ -179,9 +216,11 @@ module.exports = React.createClass({
 
     return <div className={classes} key={match._id + position} style={style} onClick={this.bandClicked.bind(this, info)}>
       {backgroundCover}
+      {playhead}
       <p>{band.name || placeholder}</p>
       <div className="links">{bandLinks}</div>
       <span className="score">{match.scores[position]}</span>
+      <div ref={band._id + '-playcontrol'} onClick={this.playBand.bind(this, band._id)}></div>
       {editControls}
       <div className="border-bottom"></div>
       <div className="border-right"></div>

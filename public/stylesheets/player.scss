@@ -68,12 +68,12 @@
   }
 }
 
-.hymn-pause {
+.hymn-pause, .pause {
   &::before {
     content: '❙❙';
   }
 }
-.hymn-play {
+.hymn-play, .play {
   &::before {
     content: '▶';
   }
