@@ -24,7 +24,8 @@ module.exports = React.createClass({
         bioValue: band.bio,
         photoValue: band.photo,
         soundcloudValue: band.soundcloud,
-        bandcampValue: band.bandcamp
+        bandcampValue: band.bandcamp,
+        trackValue: band.track
       }
     }
     return form
@@ -79,6 +80,7 @@ module.exports = React.createClass({
     var photo = React.findDOMNode(this.refs.bandPhoto).value
     var soundcloud = React.findDOMNode(this.refs.bandSoundcloud).value
     var bandcamp = React.findDOMNode(this.refs.bandBandcamp).value
+    var track = React.findDOMNode(this.refs.bandTrack).value
     if (name === '') {
       newState.formError = 'Invalid name.'
     } else if (bio.length < 2) {
@@ -106,7 +108,8 @@ module.exports = React.createClass({
             bio: bio,
             photo: photo,
             soundcloud: soundcloud,
-            bandcamp: bandcamp
+            bandcamp: bandcamp,
+            track: track
           }).save(function(err, band) {
             self.setState({
               loading: false,
@@ -135,6 +138,7 @@ module.exports = React.createClass({
       <input type="text" ref="bandPhoto" placeholder="band photo" value={this.state.form.photoValue}/>
       <input type="text" ref="bandSoundcloud" placeholder="soundcloud link" value={this.state.form.soundcloudValue}/>
       <input type="text" ref="bandBandcamp" placeholder="bandcamp link" value={this.state.form.bandcampValue}/>
+      <input type="text" ref="bandTrack" placeholder="track URL" value={this.state.form.trackValue}/>
       <button type="submit" onClick={this.saveNewBand} disabled={this.state.loading}>{this.state.loading ? 'saving...' : 'save'}</button>
     </div>
   },
