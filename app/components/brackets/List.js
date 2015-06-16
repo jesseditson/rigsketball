@@ -44,11 +44,13 @@ module.exports = React.createClass({
     this.setState(newState)
   },
   deleteBracket(id) {
-    var self = this
-    Bracket.delete(id, function(err) {
-      self.setState({error: err && err.message})
-      self.reload()
-    })
+    if (confirm("Are you sure you want to delete this bracket? You can't undo this action.")) {
+      var self = this
+      Bracket.delete(id, function(err) {
+        self.setState({error: err && err.message})
+        self.reload()
+      })
+    }
   },
   createBracketForm() {
     return <div className="create-bracket">

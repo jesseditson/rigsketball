@@ -24,11 +24,13 @@ module.exports = React.createClass({
     })
   },
   deleteBand(id) {
-    var self = this
-    Band.delete(id, function(err) {
-      self.setState({error: err && err.message})
-      self.reload()
-    })
+    if (confirm("Are you sure you want to delete this band? You can't undo this action.")) {
+      var self = this
+      Band.delete(id, function(err) {
+        self.setState({error: err && err.message})
+        self.reload()
+      })
+    }
   },
   bandsList() {
     var self = this
