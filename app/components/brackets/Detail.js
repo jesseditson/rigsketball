@@ -89,7 +89,7 @@ module.exports = React.createClass({
       self.setState({
         bracket: bracket,
         error: err,
-        selectedRound : self.props.selectedRound || self.roundNums(bracket)[0]
+        selectedRound : self.props.selectedRound || self.state.selectedRound || self.roundNums(bracket)[0]
       })
     }
     if (this.props.id) {
@@ -216,8 +216,8 @@ module.exports = React.createClass({
     }
     evt.preventDefault()
   },
-  updateDate(match, date, dateStr) {
-    match.date = dateStr
+  updateDate(match, date) {
+    match.date = date.toString()
     this.saveMatch(match)
   },
   updateInfo(match) {

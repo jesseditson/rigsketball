@@ -42,9 +42,9 @@ var App = React.createClass({
   render() {
     var mainView = <h1>Admin</h1>
     if (/brackets(\/|$)/.test(this.props.path)) {
-      mainView = <BracketMatches {...this.props}/>
+      mainView = <BracketMatches {...this.props} {...this.state}/>
     } else if (/bands(\/|$)/.test(this.props.path)) {
-      mainView = <Bands {...this.props}/>
+      mainView = <Bands {...this.props} {...this.state}/>
     }
     var error
     if (this.state.error) {
