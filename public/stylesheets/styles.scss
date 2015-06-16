@@ -265,9 +265,6 @@ button {
     height: 30px;
     text-align: center;
   }
-  .playhead {
-    width: 0px;
-  }
   p, span {
     color: $ash;
     text-shadow:
@@ -372,6 +369,9 @@ button {
     @include opacity(0.6);
     /* border:10px solid $offwhite;
     @include box-sizing(border-box); */
+    &.playhead {
+      width: 0px;
+    }
   }
   p {
     position: absolute;
