@@ -23,7 +23,13 @@ ExtendedModel.byIdDecorated = function(query,winners,callback){
     async.forEachOf(matches, function(match, idx, done){
       match.scores = match.scores || []
       match.bands = winners[idx] || match.bands || []
-      async.map(match.bands, Band.one.bind(Band), function(err, bands) {
+      async.map(match.bands, function(band, done) {
+        if (band) {
+          Band.one(band, done)
+        } else {
+          done(null, band)
+        }
+      }, function(err, bands) {
         if (err) return done(err)
         match.bands = bands
         matches[idx] = match
