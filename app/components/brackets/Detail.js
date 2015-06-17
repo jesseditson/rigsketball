@@ -214,7 +214,7 @@ module.exports = React.createClass({
                     ? 'none'
                     : 'TBD'
 
-    return <div className={classes} key={match._id + position} style={style} onClick={this.bandClicked.bind(this, info)}>
+    return <div className={classes} key={match._id + position} style={style} onClick={this.bandClicked.bind(this, info)} onMouseMove={this.hoverBand} onMouseLeave={this.unhoverBand} onMouseEnter={this.enterBand}>
       {backgroundCover}
       {playhead}
       <p>{band.name || placeholder}</p>
@@ -225,6 +225,26 @@ module.exports = React.createClass({
       <div className="border-bottom"></div>
       <div className="border-right"></div>
     </div>
+  },
+  enterBand(evt) {
+    var el = evt.currentTarget
+    el.classList.add('animate')
+    setTimeout(function() { el.classList.remove('animate') }, 400)
+  },
+  hoverBand(evt) {
+    var el = evt.currentTarget
+    try {
+      var rect = el.getBoundingClientRect()
+      var mousePos = evt.clientY - rect.top
+      var pct = mousePos / rect.height
+      el.style.backgroundPositionY = (pct * 100) + '%'
+    } catch(e) {}
+  },
+  unhoverBand(evt) {
+    var el = evt.currentTarget
+    el.classList.add('animate')
+    el.style.backgroundPosition = null
+    setTimeout(function() { el.classList.remove('animate') }, 400)
   },
   bandClicked(info, evt) {
     if (this.state.select && !info.band.name) {

@@ -357,8 +357,11 @@ button {
 }
 
 .match .band {
-  @include transition(all .2s ease-in-out);
+  @include transition(margin-bottom .2s ease-in-out);
   height: 80px;
+  &.animate {
+    @include transition(all .2s ease-in-out);
+  }
   .band-background-cover {
     width: 100%;
     height: 100%;

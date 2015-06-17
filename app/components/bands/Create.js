@@ -10,7 +10,7 @@ module.exports = React.createClass({
     return {
       formError: null,
       loading: null,
-      form: {},
+      form: this.initialForm(),
       error: null,
       message: null
     }
@@ -29,9 +29,6 @@ module.exports = React.createClass({
       }
     }
     return form
-  },
-  componentDidMount() {
-    this.setState({form: this.initialForm()})
   },
   validateURL(url, assert, cb) {
     if (!cb) {
@@ -83,9 +80,9 @@ module.exports = React.createClass({
     var track = React.findDOMNode(this.refs.bandTrack).value
     if (name === '') {
       newState.formError = 'Invalid name.'
-    } else if (bio.length < 2) {
+    } /* else if (bio.length < 2) {
       newState.formError = 'Please write a band bio.'
-    } else {
+    } */ else {
       async.parallel({
         photo: this.validateImage.bind(this, photo),
         bandcamp: this.validateURL.bind(this, bandcamp),
@@ -133,12 +130,12 @@ module.exports = React.createClass({
   createBandForm() {
     return <div className="create-band">
       <p className="form-error">{this.state.formError}</p>
-      <input type="text" ref="bandName" placeholder="band name" value={this.state.form.nameValue}/>
-      <textarea ref="bandBio" placeholder="bio" value={this.state.form.bioValue}/>
-      <input type="text" ref="bandPhoto" placeholder="band photo" value={this.state.form.photoValue}/>
-      <input type="text" ref="bandSoundcloud" placeholder="soundcloud link" value={this.state.form.soundcloudValue}/>
-      <input type="text" ref="bandBandcamp" placeholder="bandcamp link" value={this.state.form.bandcampValue}/>
-      <input type="text" ref="bandTrack" placeholder="track URL" value={this.state.form.trackValue}/>
+      <input type="text" ref="bandName" placeholder="band name" defaultValue={this.state.form.nameValue}/>
+      <textarea ref="bandBio" placeholder="bio" defaultValue={this.state.form.bioValue}/>
+      <input type="text" ref="bandPhoto" placeholder="band photo" defaultValue={this.state.form.photoValue}/>
+      <input type="text" ref="bandSoundcloud" placeholder="soundcloud link" defaultValue={this.state.form.soundcloudValue}/>
+      <input type="text" ref="bandBandcamp" placeholder="bandcamp link" defaultValue={this.state.form.bandcampValue}/>
+      <input type="text" ref="bandTrack" placeholder="track URL" defaultValue={this.state.form.trackValue}/>
       <button type="submit" onClick={this.saveNewBand} disabled={this.state.loading}>{this.state.loading ? 'saving...' : 'save'}</button>
     </div>
   },

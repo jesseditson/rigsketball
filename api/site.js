@@ -15,13 +15,15 @@ site.index = function(req,res,next){
         site.tracks = bands.reduce(function(o, band) {
           if (!band.track) return o
           var trackName = band.track.match(/\/([^\.\/]+)\.\w+$/)
-          trackName = trackName ? trackName[1] : 'untitled'
-          o[band._id] = {
-            id: band._id,
-            file: band.track,
-            cover: band.photo,
-            name: trackName,
-            band: band.name
+          // don't include tracks that don't have a file
+          if (trackName) {
+            o[band._id] = {
+              id: band._id,
+              file: band.track,
+              cover: band.photo,
+              name: trackName[1],
+              band: band.name
+            }
           }
           return o
         }, {})

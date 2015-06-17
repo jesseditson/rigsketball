@@ -22,6 +22,10 @@ var App = React.createClass({
   componentDidMount() {
     var self = this
     Site.site(function(err, site) {
+      if (err || !site) {
+        console.warn('site not found ', err && err.message, ' defaulting to not allowing signups.')
+        site = new Site({name: 'main', signupDate: new Date(), full: true})
+      }
       var signupEnabled = self.props.signupEnabled
       var signupDate = moment(new Date(site.signupDate))
       if (signupDate.isBefore(moment(new Date()))) {
@@ -94,11 +98,14 @@ var App = React.createClass({
     this.playheadUpdated(this.refs.player.state)
   },
   componentDidUpdate() {
-    if (this.refs.player) {
-      if (this.shouldPlayNext) this.refs.player.setPlaying(true)
-      this.refs.player.sync()
-    }
-    this.shouldPlayNext = false
+    var self = this
+    setTimeout(function() {
+      if (self.refs.player) {
+        if (self.shouldPlayNext) self.refs.player.setPlaying(true)
+        self.refs.player.sync()
+      }
+      self.shouldPlayNext = false
+    }, 100)
   },
   playheadUpdated: function(opts) {
     if (this.refs.bracket && this.refs.player) {
