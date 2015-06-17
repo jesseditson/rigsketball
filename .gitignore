@@ -1,6 +1,6 @@
 node_modules/
 npm-debug.log
 .DS_Store
-ansible/templates/env.j2
+env.j2
 ansible/production
 env

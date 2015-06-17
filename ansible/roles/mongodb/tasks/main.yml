@@ -19,3 +19,12 @@
 - name: run mongodb
   service: name=mongod state=started enabled=yes
   tags: mongodb
+
+- name: copy backup script
+  template: src=backup.sh dest=/root/backup.sh mode=755
+
+- name: copy backup env
+  template: src=env dest=/root/env mode=755
+
+- name: add cron job
+  cron: name="back up mongodb" minute="0" hour="10,17" job="sh /root/backup.sh"

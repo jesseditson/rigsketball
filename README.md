@@ -60,6 +60,15 @@ TUMBLR_SUBDOMAIN=rigsketball
 DEFAULT_BRACKET=pdxpopnow2015
 ```
 
+Add another file called `env` to the `ansible/roles/mongodb/templates` folder that defines environment variables used for backing mongodb up:
+
+```
+AWS_ACCESS_KEY=key
+AWS_SECRET_KEY=secret
+S3_REGION=us-west-2
+S3_BUCKET=bucket-name
+```
+
 To provision the inventory, run `./provision` from the root of this repo after creating the above files.
 
 To deploy after provisioning, run `./deploy` from the root of this repo after running the provision script.
