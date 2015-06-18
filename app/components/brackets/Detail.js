@@ -9,6 +9,7 @@ var Typeahead = require('react-typeahead').Typeahead
 var DateTimePicker = require('react-widgets/lib/DateTimePicker')
 var moment = require('moment')
 var Radius = require('../Radius')
+var window = require("global/window")
 
 var dateString = function(matchDate){
   var dateString = 'TBD'
@@ -65,9 +66,15 @@ module.exports = React.createClass({
     this.updateMainClass()
     window.addEventListener('resize', this.handleResize)
     this.handleResize()
+    var self = this
+    // poll and reload our bracket ever 2 seconds
+    this.pollTimer = setInterval(function() {
+      self.loadBracket()
+    }, 2000)
   },
   componentWillUnmount: function() {
     window.removeEventListener('resize', this.handleResize);
+    clearInterval(this.pollTimer)
   },
   componentDidUpdate() {
     this.updateMainClass()
@@ -477,7 +484,7 @@ module.exports = React.createClass({
 
     var radius
     if (this.state.bracketMode) {
-      radius = <Radius centerX={window.outerWidth / 2} centerY={100} color={'rgba(246,247,189,0.1)'}/>
+      radius = <Radius centerX={(window.outerWidth || 1280) / 2} centerY={100} color={'rgba(246,247,189,0.1)'}/>
     }
 
     return <div className="bracket">

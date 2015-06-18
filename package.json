@@ -12,6 +12,7 @@
     "ejs-locals": "^1.0.2",
     "express": "~4.12.4",
     "express-session": "^1.11.2",
+    "global": "^4.3.0",
     "mise-model": "0.0.5",
     "mise-model-mongo": "0.0.4",
     "mise-model-rest": "0.0.2",

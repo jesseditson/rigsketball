@@ -6,6 +6,7 @@ var Tumblr = require('./Tumblr')
 var Site = require('../models/rest/Site')
 var moment = require('moment')
 var Player = require('./player/Player')
+var window = require("global/window")
 
 var App = React.createClass({
   getInitialState() {
@@ -136,7 +137,7 @@ var App = React.createClass({
     switch (this.state.selectedPage) {
       case 'bracket':
         var bracketMode = false
-        if (/bracket\/wide(\/|$)/.test(window.location.pathname)) bracketMode = true
+        if (/bracket\/wide(\/|$)/.test(window.location && window.location.pathname)) bracketMode = true
         page = <Bracket ref="bracket" bracketName={this.state.bracketName} playBand={this.playBand} {...this.props} {...this.state} bracketMode={bracketMode}/>
         break
       default:
