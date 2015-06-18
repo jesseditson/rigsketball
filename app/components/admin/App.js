@@ -11,7 +11,8 @@ var App = React.createClass({
   getInitialState() {
     return {
       site: {},
-      error: null
+      error: null,
+      bracketMode: 'disabled'
     }
   },
   componentDidMount() {

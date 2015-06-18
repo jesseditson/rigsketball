@@ -444,3 +444,11 @@ button {
     font-size: 1.6em;
   }
 }
+
+.winner-crown {
+  position: absolute;
+  top: -49px;
+  right: -37px;
+  width: 110px;
+  z-index: 1000;
+}

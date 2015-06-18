@@ -46,8 +46,13 @@ module.exports = React.createClass({
       matchStates: {}
     }
   },
-  handleResize: function(e) {
-    this.setState({bracketMode: window.innerWidth >= 1024})
+  bracketMode() {
+    return this.state.bracketMode === 'disabled' ? false : this.state.bracketMode
+  },
+  handleResize(e) {
+    if (this.state.bracketMode  !== 'disabled') {
+      this.setState({bracketMode: window.innerWidth >= 1024})
+    }
   },
   currentTrackId: null,
   getDefaultProps() {
@@ -58,7 +63,7 @@ module.exports = React.createClass({
   },
   updateMainClass() {
     var main = document.getElementById('main-mount')
-    main.classList[this.state.bracketMode ? 'add' : 'remove']('bracket-mode')
+    main.classList[this.bracketMode() ? 'add' : 'remove']('bracket-mode')
   },
   componentDidMount() {
     this.loadBracket()
@@ -70,7 +75,7 @@ module.exports = React.createClass({
     // poll and reload our bracket ever 2 seconds
     this.pollTimer = setInterval(function() {
       self.loadBracket()
-    }, 2000)
+    }, 5000)
   },
   componentWillUnmount: function() {
     window.removeEventListener('resize', this.handleResize);
@@ -79,6 +84,7 @@ module.exports = React.createClass({
   componentDidUpdate() {
     this.updateMainClass()
   },
+  playControls: {},
   updatePlayerTime(currentTrack, trackPercent, isPlaying) {
     if (currentTrack && trackPercent) {
       if (currentTrack.id !== this.currentTrackId || this.playing !== isPlaying) {
@@ -91,13 +97,17 @@ module.exports = React.createClass({
             var id = m[1]
             var playing = id == self.currentTrackId
             self.refs[r].getDOMNode().style.width = '0%'
-            var list = self.refs[id + '-playcontrol'].getDOMNode().classList
-            if (playing && isPlaying) {
-              list.remove('play')
-              list.add('pause')
-            } else {
-              list.add('play')
-              list.remove('pause')
+            if (self.playControls[id]) {
+              self.playControls[id].forEach(function(c) {
+                var list = self.refs[c].getDOMNode().classList
+                if (playing && isPlaying) {
+                  list.remove('play')
+                  list.add('pause')
+                } else {
+                  list.add('play')
+                  list.remove('pause')
+                }
+              })
             }
           }
         })
@@ -184,7 +194,7 @@ module.exports = React.createClass({
       this.props.playBand(id)
     }
   },
-  band(band, match, position, editable) {
+  band(band, match, position, editable, final) {
     var bands = this.state.bands
     band = band || {}
     var editControls
@@ -196,6 +206,10 @@ module.exports = React.createClass({
       editControls = <div>
         <Typeahead options={bands} onOptionSelected={this.selectBand.bind(this, match, position)} placeholder="change band"/>
         {remove}
+        <input type="number" defaultValue={match.scores[position]} placeholder="score" onBlur={this.updateScore.bind(this, match, position)}/>
+      </div>
+    } else if (this.props.editMode) {
+      editControls = <div>
         <input type="number" defaultValue={match.scores[position]} placeholder="score" onBlur={this.updateScore.bind(this, match, position)}/>
       </div>
     }
@@ -232,6 +246,15 @@ module.exports = React.createClass({
       editable: editable
     }
 
+    var crown
+    if (final && match.winner._id === band._id) {
+      crown = <img src="/img/crown.png" className="winner-crown"/>
+    }
+
+    var playControlRef = band._id + '-' + match._id + '-playcontrol'
+    this.playControls[band._id] = this.playControls[band._id] || []
+    this.playControls[band._id].push(playControlRef)
+
     var placeholder = selectable
                     ? 'available'
                     : editable
@@ -244,10 +267,11 @@ module.exports = React.createClass({
       <p>{band.name || placeholder}</p>
       <div className="links">{bandLinks}</div>
       <span className="score">{match.scores[position]}</span>
-      <div ref={band._id + '-playcontrol'} onClick={this.playBand.bind(this, band._id)}></div>
+      <div ref={playControlRef} onClick={this.playBand.bind(this, band._id)}></div>
       {editControls}
       <div className="border-bottom"></div>
       <div className="border-right"></div>
+      {crown}
     </div>
   },
   enterBand(evt) {
@@ -325,7 +349,7 @@ module.exports = React.createClass({
     i[match._id] = !this.state.matchStates[match._id]
     this.setState({matchStates: i})
   },
-  match(editable, match) {
+  match(editable, final, match) {
     var info
     var date = match.date ? new Date(match.date) : null
     if (this.props.editMode) {
@@ -357,8 +381,8 @@ module.exports = React.createClass({
     var classes = (this.props.editMode ? 'match-edit' : 'match') + (this.state.matchStates[match._id] ? ' open' : ' closed')
 
     return <div className={classes} key={match._id}>
-      {this.band(match.bands[0], match, 0, editable)}
-      {this.band(match.bands[1], match, 1, editable)}
+      {this.band(match.bands[0], match, 0, editable, final)}
+      {this.band(match.bands[1], match, 1, editable, final)}
       {info}
       <div className="bubble" onClick={this.toggleOpen.bind(this, match)}>
         <span className={bubble.class}>
@@ -374,11 +398,12 @@ module.exports = React.createClass({
       return parseInt(a) > parseInt(b) ? -1 : 1
     })
   },
-  round(round, num, editable) {
-    var matches = round.map(this.match.bind(this, editable))
+  round(round, num, editable, final) {
+    var matches = round.map(this.match.bind(this, editable, final))
     var right = []
+    var middle = Math.floor(matches.length / 2)
     var left = matches.filter(function(m, i) {
-      if (i % 2) {
+      if (i < middle) {
         return true
       }
       right.push(m)
@@ -400,10 +425,10 @@ module.exports = React.createClass({
     var renderRound = function(k) {
       var firstRound = roundNums[0] === k
       var round = rounds[k]
-      return self.round(round, k, firstRound)
+      return self.round(round, k, firstRound, 1 === +k)
     }
     var rendered
-    if (this.state.bracketMode) {
+    if (this.bracketMode()) {
       rendered = roundNums.map(renderRound)
     } else {
       rendered = renderRound(this.state.selectedRound)
@@ -417,7 +442,7 @@ module.exports = React.createClass({
     if (e) e.preventDefault()
   },
   roundNav() {
-    if (this.state.bracketMode) return
+    if (this.bracketMode()) return
     var self = this
     var rounds = this.state.bracket.rounds
     var bracketName = this.state.bracket.name
@@ -483,7 +508,7 @@ module.exports = React.createClass({
     var error = this.state.error
 
     var radius
-    if (this.state.bracketMode) {
+    if (this.bracketMode()) {
       radius = <Radius centerX={(window.outerWidth || 1280) / 2} centerY={100} color={'rgba(246,247,189,0.1)'}/>
     }
 
