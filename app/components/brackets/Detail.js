@@ -8,6 +8,7 @@ var async = require('async')
 var Typeahead = require('react-typeahead').Typeahead
 var DateTimePicker = require('react-widgets/lib/DateTimePicker')
 var moment = require('moment')
+var Radius = require('../Radius')
 
 var dateString = function(matchDate){
   var dateString = 'TBD'
@@ -38,11 +39,14 @@ module.exports = React.createClass({
       bands: [],
       bandsMap: {},
       selectedRound: null,
-      bracketMode: false,
+      bracketMode: this.props.bracketMode || false,
       modal: {},
       select: this.props.select,
       matchStates: {}
     }
+  },
+  handleResize: function(e) {
+    this.setState({bracketMode: window.innerWidth >= 1024})
   },
   currentTrackId: null,
   getDefaultProps() {
@@ -51,9 +55,22 @@ module.exports = React.createClass({
       selectedRound: null
     }
   },
+  updateMainClass() {
+    var main = document.getElementById('main-mount')
+    main.classList[this.state.bracketMode ? 'add' : 'remove']('bracket-mode')
+  },
   componentDidMount() {
     this.loadBracket()
     this.loadBands()
+    this.updateMainClass()
+    window.addEventListener('resize', this.handleResize)
+    this.handleResize()
+  },
+  componentWillUnmount: function() {
+    window.removeEventListener('resize', this.handleResize);
+  },
+  componentDidUpdate() {
+    this.updateMainClass()
   },
   updatePlayerTime(currentTrack, trackPercent, isPlaying) {
     if (currentTrack && trackPercent) {
@@ -341,6 +358,7 @@ module.exports = React.createClass({
           {bubble.text}
         </span>
       </div>
+      <div className="bracket-arrow"></div>
     </div>
   },
   roundNums(bracket) {
@@ -457,7 +475,13 @@ module.exports = React.createClass({
     var bracket = this.state.bracket || {}
     var error = this.state.error
 
+    var radius
+    if (this.state.bracketMode) {
+      radius = <Radius centerX={window.outerWidth / 2} centerY={100} color={'rgba(246,247,189,0.1)'}/>
+    }
+
     return <div className="bracket">
+      {radius}
       {this.signupMessage()}
       {this.roundNav()}
       <h5 className="error" style={{display: error ? 'block' : 'none'}}>{error}</h5>

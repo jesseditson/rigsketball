@@ -1,0 +1,206 @@
+#main-mount.bracket-mode {
+  max-width: 100%;
+  height: 1530px;
+}
+
+.radius {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: -1000;
+}
+
+.bracket-mode {
+
+  .bubble {
+    @include opacity(0.75);
+    &:hover {
+      @include opacity(1);
+    }
+  }
+
+  .bracket {
+    font-size: 0.6em;
+
+    .match {
+      .bubble {
+        width: 50px;
+        height: 50px;
+        line-height: 18px;
+        margin-left: -25px;
+        margin-top: -25px;
+        span.date {
+          top: 8px;
+        }
+      }
+      .info {
+        font-size: 0.8em;
+      }
+    }
+  }
+
+  .bracket-arrow {
+    border: 2px solid white;
+    position: absolute;
+    width: 100%;
+    height: 50%;
+    z-index: -1;
+    top: 40%;
+  }
+  .right .bracket-arrow {
+    left: -60%;
+  }
+  .left .bracket-arrow {
+    right: -60%;
+  }
+
+  .right .match:nth-child(odd) .bracket-arrow {
+    border-bottom: 0px;
+    border-right: 0px;
+  }
+  .right .match:nth-child(even) .bracket-arrow {
+    top: 12%;
+    border-top: 0px;
+    border-right: 0px;
+  }
+  .left .match:nth-child(odd) .bracket-arrow {
+    border-bottom: 0px;
+    border-left: 0px;
+  }
+  .left .match:nth-child(even) .bracket-arrow {
+    top: 12%;
+    border-top: 0px;
+    border-left: 0px;
+  }
+
+  .rounds {
+    height: 1530px;
+    position: relative;
+    .round {
+      position: absolute;
+      width: 100%;
+    }
+  }
+
+  .row {
+    position: absolute;
+    width: 15%;
+    height: 100%;
+    .match {
+      margin-bottom: 15px;
+    }
+    .match .band {
+      height: 50px;
+      margin-bottom: 5px;
+    }
+  }
+  .round16 {
+    .left {
+      left: 5px;
+    }
+    .right {
+      right: 5px;
+    }
+  }
+
+  .round8 {
+    .bracket-arrow {
+      top: 50%;
+      height: 60%;
+    }
+    .right .bracket-arrow {
+      left: -20%;
+    }
+    .left .bracket-arrow {
+      right: -20%;
+    }
+    .match:nth-child(even) .bracket-arrow {
+      top: -9%;
+    }
+    .match:first-child {
+      margin-top: 5em;
+    }
+    .match {
+      margin-bottom: 11.4em;
+    }
+    .left {
+      left: 17%;
+    }
+    .right {
+      right: 17%;
+    }
+  }
+  .round4 {
+
+    .bracket-arrow {
+      height: 180%;
+      width: 10%;
+      top: 50%;
+    }
+    .right .bracket-arrow {
+      left: -7%;
+    }
+    .left .bracket-arrow {
+      right: -13%;
+    }
+
+    .match:nth-child(even) .bracket-arrow {
+      top: -129%;
+    }
+
+    .match:first-child {
+      margin-top: 15.4em;
+    }
+    .match {
+      margin-bottom: 32.5em;
+    }
+    .left {
+      left: 28%;
+    }
+    .right {
+      right: 28%;
+    }
+  }
+  .round2 {
+    .bracket-arrow {
+      top: -26em;
+      border-top: 0px;
+      height: 30.9em;
+    }
+    .right .bracket-arrow {
+      left: -2px;
+    }
+    .left .bracket-arrow {
+      right: -5px;
+    }
+    .match {
+      margin-top: 36.4em;
+    }
+    .row {
+      width: 18%;
+    }
+    .left {
+      left: 31.5%;
+    }
+    .right {
+      right: 31.5%;
+    }
+  }
+  .round1 {
+    .bracket-arrow {
+      display: none;
+    }
+    .match {
+      margin-top: 1em;
+    }
+    .row {
+      left: 50%;
+      margin-left: -12.5%;
+      width: 25%;
+    }
+  }
+
+  .round .match:last-child {
+    margin-bottom: 0px;
+  }
+}

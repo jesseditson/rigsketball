@@ -95,6 +95,7 @@ var App = React.createClass({
     } else if (next) {
       this.setState({currentTrack: next})
     }
+    this.shouldPlayNext = true
     this.playheadUpdated(this.refs.player.state)
   },
   componentDidUpdate() {
@@ -134,7 +135,9 @@ var App = React.createClass({
     var page
     switch (this.state.selectedPage) {
       case 'bracket':
-        page = <Bracket ref="bracket" bracketName={this.state.bracketName} playBand={this.playBand} {...this.props} {...this.state}/>
+        var bracketMode = false
+        if (/bracket\/wide(\/|$)/.test(window.location.pathname)) bracketMode = true
+        page = <Bracket ref="bracket" bracketName={this.state.bracketName} playBand={this.playBand} {...this.props} {...this.state} bracketMode={bracketMode}/>
         break
       default:
         page = <Tumblr {...this.props} />
