@@ -56,6 +56,22 @@ app.set('views', path.join(__dirname, 'views'))
 app.engine('ejs', engine)
 app.set('view engine', 'ejs')
 
+// arbitrary proxy
+var http = require('http')
+app.all('/proxy', function(req, res, next) {
+  var url = req.query.url
+  if(!url) return res.status(404).send('Not Found.')
+
+  var proxy = http.request(url, function (r) {
+    r.pipe(res, {
+      end: true
+    })
+  })
+  req.pipe(proxy, {
+    end: true
+  })
+})
+
 // auth
 var passport = require('passport')
 app.use(passport.initialize())

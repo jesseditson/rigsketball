@@ -1,6 +1,8 @@
 var Site = require('../app/models/mongo/Site')
 var Band = require('../app/models/mongo/Band')
 var brackets = require('./brackets')
+var id3 = require('id3js')
+var async = require('async')
 var site = {}
 
 var resourceName = Site.prototype.collection
