@@ -19,7 +19,6 @@ var decorateID3Info = function(tracks, callback) {
         if (tags.title) track.name = tags.title
         if (tags.band) track.band = tags.band
       }
-      console.log(tags)
       return done(null, track)
     });
   }, callback)

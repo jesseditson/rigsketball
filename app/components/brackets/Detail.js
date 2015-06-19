@@ -247,7 +247,7 @@ module.exports = React.createClass({
     }
 
     var crown
-    if (final && math.bands[0] && match.bands[1] && match.winner._id === band._id) {
+    if (final && match.bands[0] && match.bands[1] && match.winner._id === band._id) {
       crown = <img src="/img/crown.png" className="winner-crown"/>
     }
 
