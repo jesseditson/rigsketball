@@ -251,9 +251,13 @@ module.exports = React.createClass({
       crown = <img src="/img/crown.png" className="winner-crown"/>
     }
 
-    var playControlRef = band._id + '-' + match._id + '-playcontrol'
-    this.playControls[band._id] = this.playControls[band._id] || []
-    this.playControls[band._id].push(playControlRef)
+    var playcontrol
+    if (this.props.tracks[band._id]) {
+      var playControlRef = band._id + '-' + match._id + '-playcontrol'
+      this.playControls[band._id] = this.playControls[band._id] || []
+      this.playControls[band._id].push(playControlRef)
+      playcontrol = <div ref={playControlRef} onClick={this.playBand.bind(this, band._id)}></div>
+    }
 
     var placeholder = selectable
                     ? 'available'
@@ -267,7 +271,7 @@ module.exports = React.createClass({
       <p>{band.name || placeholder}</p>
       <div className="links">{bandLinks}</div>
       <span className="score">{match.scores[position]}</span>
-      <div ref={playControlRef} onClick={this.playBand.bind(this, band._id)}></div>
+      {playcontrol}
       {editControls}
       <div className="border-bottom"></div>
       <div className="border-right"></div>

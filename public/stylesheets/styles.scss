@@ -76,9 +76,13 @@ footer {
   }
 }
 
-h1 {
+h1, h4 {
   font-family: 'nexa_rust_sansblack';
   color: $cyan;
+}
+h4 {
+  font-size: 1em;
+  margin: 10px 0px;
 }
 .header h1 {
   font-family: 'nexa_rust_slabblack_shadow_01';

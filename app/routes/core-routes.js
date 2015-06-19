@@ -5,6 +5,16 @@ var Band = require('../models/mongo/Band')
 var tumblr = require('../lib/tumblr')
 var ensureLoggedIn = require('../../api/auth/ensureLoggedIn')
 
+
+var async = require('async')
+var path = require('path')
+var rimraf = require('rimraf')
+var mkdirp = require('mkdirp')
+var httpreq = require('httpreq')
+var crypto = require('crypto')
+var fs = require('fs')
+var archiver = require('archiver')
+
 module.exports = function(app) {
 
   var admin = function(req, res) {
@@ -17,6 +27,78 @@ module.exports = function(app) {
   }
   app.get('/admin/*?', ensureLoggedIn, admin)
   app.get('/admin', ensureLoggedIn, admin)
+
+  app.get('/comp-tracks/download', function(req, res, next) {
+    Band.all(function(err, bands) {
+      if (err) return res.status(500).json({error : err.message})
+      var tmpFolder = path.join(__dirname, '../../tmp')
+      var tracksFolder = path.join(tmpFolder, 'tracks')
+      mkdirp(tracksFolder, function(err) {
+        if (err) return res.status(500).json({error : err.message})
+        var allbands = ''
+        var files = []
+        async.forEach(bands, function(band, done) {
+          var trackName = band.track.match(/\/([^\.\/]+\.\w+)$/)
+          if (!band.track || !trackName) return done(null)
+          trackName = trackName[1]
+          allbands += band._id
+          var filePath = path.join(tracksFolder, band.name + '-' + trackName)
+          fs.exists(filePath, function(ok) {
+            if (!ok) {
+              httpreq.download(
+                  band.track,
+                  filePath
+              , function (err, progress){
+                  if (err) return done(err)
+              }, function (err, res){
+                  if (err) return done(err)
+                  console.log('finished downloading ' + band.track)
+                  files.push(filePath)
+                  done(null)
+              })
+            } else {
+              files.push(filePath)
+              done(null)
+            }
+          })
+        }, function(err) {
+          if (err) {
+            return rimraf(tmpFolder, function() {
+              res.status(500).json({error : err.message})
+            })
+          }
+          var hash = crypto.createHash('md5').update(allbands).digest('hex')
+          var zipFile = path.join(tmpFolder, hash + '.zip')
+          fs.exists(zipFile, function(ok) {
+            var done = function() {
+              res.download(zipFile, 'rigsketball-tracks.zip', function(err) {
+                if (err) res.status(500).json({error : err.message})
+              })
+            }
+            if (!ok) {
+
+              var output = fs.createWriteStream(zipFile)
+              var archive = archiver('zip')
+
+              output.on('close', function () {
+                done()
+              })
+
+              archive.on('error', function(err){
+                if (err) res.status(500).json({error : err.message})
+              })
+
+              archive.pipe(output)
+              archive.directory(tracksFolder, 'tracks')
+              archive.finalize()
+            } else {
+              done()
+            }
+          })
+        })
+      })
+    })
+  })
 
   app.get('/*?', function(req, res, next) {
     // React.renderToString takes your component
