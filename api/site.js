@@ -1,7 +1,6 @@
 var Site = require('../app/models/mongo/Site')
 var Band = require('../app/models/mongo/Band')
 var brackets = require('./brackets')
-var id3 = require('id3js')
 var async = require('async')
 var site = {}
 
@@ -16,15 +15,22 @@ site.index = function(req,res,next){
         if (err) return res.status(500).json({error : err.message})
         site.tracks = bands.reduce(function(o, band) {
           if (!band.track) return o
-          var trackName = band.track.match(/\/([^\.\/]+)\.\w+$/)
+          band.trackInfo = band.trackInfo || {}
+          if (!band.trackInfo.title) {
+            var title = band.track.match(/\/([^\.\/]+)\.\w+$/)
+            if (title) {
+              band.trackInfo.title = title[1]
+            }
+          }
+          if (!band.trackInfo.artist) band.trackInfo.artist = band.name
           // don't include tracks that don't have a file
-          if (trackName) {
+          if (band.trackInfo.title) {
             o[band._id] = {
               id: band._id,
               file: band.track,
               cover: band.photo,
-              name: trackName[1],
-              band: band.name
+              name: band.trackInfo.title,
+              band: band.trackInfo.artist
             }
           }
           return o

@@ -22,6 +22,9 @@ var Band = module.exports = new Model('Band',{
   track: {
     type: String
   },
+  trackInfo: {
+    type: 'Any'
+  },
   // soundcloud username
   soundcloud: {
     type: String
