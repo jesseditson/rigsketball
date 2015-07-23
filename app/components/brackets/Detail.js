@@ -252,7 +252,7 @@ module.exports = React.createClass({
     }
 
     var playcontrol
-    if (this.props.tracks[band._id]) {
+    if (this.props.tracks && this.props.tracks[band._id]) {
       var playControlRef = band._id + '-' + match._id + '-playcontrol'
       this.playControls[band._id] = this.playControls[band._id] || []
       this.playControls[band._id].push(playControlRef)
