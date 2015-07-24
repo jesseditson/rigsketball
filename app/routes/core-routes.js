@@ -19,10 +19,10 @@ module.exports = function(app) {
 
   var admin = function(req, res) {
     var pagePath = req.params[0] ? req.params[0].replace(/\/$/,'') : ''
-    var reactHtml = React.renderToString(<Admin path={pagePath}/>)
+    // var reactHtml = React.renderToString(<Admin path={pagePath}/>)
     res.render('admin/index.ejs', {
       props: {path: pagePath},
-      reactOutput: reactHtml
+      // reactOutput: reactHtml
     })
   }
   app.get('/admin/*?', ensureLoggedIn, admin)
@@ -110,14 +110,15 @@ module.exports = function(app) {
     }
 
     var render = function() {
-      tumblr.posts({}, function(err, data) {
-        if (err) return next(err)
-        var reactHtml = React.renderToString(<App {...opts} tumblrData={data}/>)
-        res.render('index.ejs', {
-          props: opts,
-          reactOutput: reactHtml
-        })
+      res.render('index.ejs', {
+        props: opts,
+        // reactOutput: reactHtml
       })
+      // tumblr.posts({}, function(err, data) {
+      //   if (err) return next(err)
+      //   // var reactHtml = React.renderToString(<App {...opts} tumblrData={data}/>)
+      //
+      // })
     }
 
     if (req.session.signupBand) {
