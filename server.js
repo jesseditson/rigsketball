@@ -9,8 +9,7 @@ var logger = require('morgan')
 var session = require('express-session')
 var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
-var MongoStore = require('connect-mongo')(session)
-var tumblr = require('./app/routes/tumblr');
+var tumblr = require('./app/routes/tumblr')
 
 var port = process.env.APP_PORT || 4444
 var address = process.env.APP_IP || '127.0.0.1'
@@ -24,13 +23,31 @@ app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
-app.use(session({
-  secret : 'talented-bust-loss',
-  name : 'Rigsketball',
-  resave : false,
-  saveUninitialized : false,
-  store: new MongoStore(require('./app/models/mongo/config'))
-}))
+
+if (app.get('env') === 'development') {
+  var MongoStore = require('connect-mongo')(session)
+  app.use(session({
+    secret : 'talented-bust-loss',
+    name : 'Rigsketball',
+    resave : false,
+    saveUninitialized : false,
+    store: new MongoStore(require('./app/models/mongo/config'))
+  }))
+} else {
+  var RedisStore = require('connect-redis')(session)
+  app.use(session({
+    name : 'Rigsketball',
+    store: new RedisStore({
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
+      pass: process.env.REDIS_PASS
+    }),
+    resave : false,
+    saveUninitialized : false,
+    secret: 'talented-bust-loss'
+  }))
+}
+
 
 // compass styles
 if (app.get('env') === 'development') {
